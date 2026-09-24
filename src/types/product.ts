@@ -31,6 +31,7 @@ export type Product = {
   imgs?: {
     thumbnails: string[];
     previews: string[];
+    variants?: ProductColorVariant[];
   };
   /** Color/dial/strap variants for Shopify-style swatch switcher */
   variants?: ProductColorVariant[];

@@ -2,7 +2,7 @@
 
 import React, { useState } from "react";
 import toast from "react-hot-toast";
-import { MessageSquare, Mail, MapPin, Send, CheckCircle2 } from "lucide-react";
+import { MessageSquare, Mail, MapPin, Send, CheckCircle2, Instagram } from "lucide-react";
 
 const Contact = () => {
   const [name, setName] = useState("");
@@ -114,6 +114,33 @@ const Contact = () => {
               Near UMT, PIA Road, Johar Town, Lahore, Pakistan
             </p>
           </div>
+        </div>
+
+        {/* Official Social Media Channels */}
+        <div className="flex flex-wrap items-center justify-center gap-3 sm:gap-4 mb-14">
+          <span className="text-xs font-semibold text-gray-500 uppercase tracking-wider">
+            Follow Our Channels:
+          </span>
+          <a
+            href="https://www.instagram.com/gloriatimes_/?hl=en"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="inline-flex items-center gap-2 px-4 py-2 rounded-full border border-gray-200 bg-white hover:border-black text-gray-900 text-xs font-semibold shadow-xs hover:shadow transition"
+          >
+            <Instagram className="w-4 h-4 text-pink-600" />
+            <span>Instagram @gloriatimes_</span>
+          </a>
+          <a
+            href="https://www.tiktok.com/@gloriatimes"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="inline-flex items-center gap-2 px-4 py-2 rounded-full border border-gray-200 bg-white hover:border-black text-gray-900 text-xs font-semibold shadow-xs hover:shadow transition"
+          >
+            <svg className="w-4 h-4 fill-current" viewBox="0 0 24 24">
+              <path d="M19.589 6.686a4.793 4.793 0 0 1-3.77-4.245V2h-3.445v13.672a2.896 2.896 0 0 1-2.903 2.894 2.895 2.895 0 0 1-2.894-2.894 2.895 2.895 0 0 1 2.894-2.894c.31 0 .607.05.886.138V9.387a6.327 6.327 0 0 0-.886-.062A6.338 6.338 0 0 0 3 15.663a6.338 6.338 0 0 0 6.338 6.337 6.338 6.338 0 0 0 6.338-6.337V8.583a8.175 8.175 0 0 0 4.913 1.636V6.784a4.83 4.83 0 0 1-1-.098z" />
+            </svg>
+            <span>TikTok @gloriatimes</span>
+          </a>
         </div>
 
         {/* Send Us A Message Form (Exact 2S Store Layout) */}

@@ -4,43 +4,43 @@ import { createClient } from "./client";
 const LOCAL_STORAGE_KEY = "gt_instagram_settings_v1";
 
 const DEFAULT_SETTINGS: InstagramSettings = {
-  profile_url: "https://www.instagram.com/gloriatimes.pk",
-  handle: "@gloriatimes.pk",
+  profile_url: "https://www.instagram.com/gloriatimes_/?hl=en",
+  handle: "@gloriatimes_",
   title: "Follow Us On Instagram",
-  subtitle: "Tag @gloriatimes to be featured in our luxury timepiece gallery",
+  subtitle: "Tag @gloriatimes_ to be featured in our luxury timepiece gallery",
   enabled: true,
   posts: [
     {
       id: "1",
-      post_url: "https://www.instagram.com/gloriatimes.pk",
+      post_url: "https://www.instagram.com/gloriatimes_/?hl=en",
       image_url: "/images/hero-lineup/tissot.webp",
       caption: "Tissot PRX Automatic Blue Dial on wrist",
       likes: "1.4k",
     },
     {
       id: "2",
-      post_url: "https://www.instagram.com/gloriatimes.pk",
+      post_url: "https://www.instagram.com/gloriatimes_/?hl=en",
       image_url: "/images/hero-lineup/rolex-submariner.jpg",
       caption: "Rolex Submariner Ceramic Date - Pure luxury",
       likes: "2.8k",
     },
     {
       id: "3",
-      post_url: "https://www.instagram.com/gloriatimes.pk",
+      post_url: "https://www.instagram.com/gloriatimes_/?hl=en",
       image_url: "/images/hero-lineup/cartier.webp",
       caption: "Cartier Santos De Cartier Automatic square Roman dial",
       likes: "1.9k",
     },
     {
       id: "4",
-      post_url: "https://www.instagram.com/gloriatimes.pk",
+      post_url: "https://www.instagram.com/gloriatimes_/?hl=en",
       image_url: "/images/hero-lineup/main.webp",
       caption: "Patek Philippe Nautilus Automatic - Collector edition",
       likes: "3.5k",
     },
     {
       id: "5",
-      post_url: "https://www.instagram.com/gloriatimes.pk",
+      post_url: "https://www.instagram.com/gloriatimes_/?hl=en",
       image_url: "/images/hero-lineup/rolex-jubilee.webp",
       caption: "Rolex Datejust Jubilee two-tone golden fluted bezel",
       likes: "2.1k",

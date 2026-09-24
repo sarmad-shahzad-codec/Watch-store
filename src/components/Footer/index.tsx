@@ -143,6 +143,28 @@ const Footer = () => {
                   0325-7982233
                 </a>
               </li>
+              <li className="pt-2 flex items-center flex-wrap gap-2 text-xs">
+                <a
+                  href="https://www.instagram.com/gloriatimes_/?hl=en"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-md bg-gray-100 hover:bg-black text-gray-800 hover:text-white transition-colors font-medium text-[11px]"
+                >
+                  <Instagram className="w-3.5 h-3.5" />
+                  <span>@gloriatimes_</span>
+                </a>
+                <a
+                  href="https://www.tiktok.com/@gloriatimes"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-md bg-gray-100 hover:bg-black text-gray-800 hover:text-white transition-colors font-medium text-[11px]"
+                >
+                  <svg className="w-3.5 h-3.5 fill-current" viewBox="0 0 24 24">
+                    <path d="M19.589 6.686a4.793 4.793 0 0 1-3.77-4.245V2h-3.445v13.672a2.896 2.896 0 0 1-2.903 2.894 2.895 2.895 0 0 1-2.894-2.894 2.895 2.895 0 0 1 2.894-2.894c.31 0 .607.05.886.138V9.387a6.327 6.327 0 0 0-.886-.062A6.338 6.338 0 0 0 3 15.663a6.338 6.338 0 0 0 6.338 6.337 6.338 6.338 0 0 0 6.338-6.337V8.583a8.175 8.175 0 0 0 4.913 1.636V6.784a4.83 4.83 0 0 1-1-.098z" />
+                  </svg>
+                  <span>@gloriatimes</span>
+                </a>
+              </li>
             </ul>
           </div>
 
@@ -193,13 +215,30 @@ const Footer = () => {
             {/* Social Icons Row */}
             <div className="flex items-center gap-4 mt-6 text-gray-700">
               <a
-                href="https://instagram.com"
+                href="https://www.instagram.com/gloriatimes_/?hl=en"
                 target="_blank"
                 rel="noopener noreferrer"
-                aria-label="Instagram"
+                aria-label="Instagram @gloriatimes_"
                 className="hover:text-black transition-colors"
+                title="Gloria Times on Instagram"
               >
                 <Instagram className="w-4 h-4" />
+              </a>
+              <a
+                href="https://www.tiktok.com/@gloriatimes"
+                target="_blank"
+                rel="noopener noreferrer"
+                aria-label="TikTok @gloriatimes"
+                className="hover:text-black transition-colors"
+                title="Gloria Times on TikTok"
+              >
+                <svg
+                  className="w-4 h-4 fill-current"
+                  viewBox="0 0 24 24"
+                  aria-hidden="true"
+                >
+                  <path d="M19.589 6.686a4.793 4.793 0 0 1-3.77-4.245V2h-3.445v13.672a2.896 2.896 0 0 1-2.903 2.894 2.895 2.895 0 0 1-2.894-2.894 2.895 2.895 0 0 1 2.894-2.894c.31 0 .607.05.886.138V9.387a6.327 6.327 0 0 0-.886-.062A6.338 6.338 0 0 0 3 15.663a6.338 6.338 0 0 0 6.338 6.337 6.338 6.338 0 0 0 6.338-6.337V8.583a8.175 8.175 0 0 0 4.913 1.636V6.784a4.83 4.83 0 0 1-1-.098z" />
+                </svg>
               </a>
               <a
                 href="https://facebook.com"
@@ -218,15 +257,6 @@ const Footer = () => {
                 className="hover:text-black transition-colors"
               >
                 <Youtube className="w-4 h-4" />
-              </a>
-              <a
-                href="https://tiktok.com"
-                target="_blank"
-                rel="noopener noreferrer"
-                aria-label="TikTok"
-                className="hover:text-black transition-colors text-xs font-bold"
-              >
-                <span>d</span>
               </a>
               <a
                 href="https://linkedin.com"

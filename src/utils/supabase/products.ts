@@ -33,7 +33,17 @@ export function mapRowToProduct(row: DbProductRow): Product {
     }
   }
 
-  let imgs = { thumbnails: ["/images/rolex.webp"], previews: ["/images/rolex.webp"] };
+  let variants: any = undefined;
+  if (row.imgs && typeof row.imgs === "object" && Array.isArray(row.imgs.variants) && row.imgs.variants.length > 0) {
+    variants = row.imgs.variants;
+  } else if ((row as any).variants && Array.isArray((row as any).variants) && (row as any).variants.length > 0) {
+    variants = (row as any).variants;
+  }
+
+  let imgs: any = {
+    thumbnails: ["/images/rolex.webp"],
+    previews: ["/images/rolex.webp"],
+  };
   if (row.imgs && typeof row.imgs === "object") {
     imgs = {
       thumbnails: Array.isArray(row.imgs.thumbnails) && row.imgs.thumbnails.length > 0
@@ -42,6 +52,7 @@ export function mapRowToProduct(row: DbProductRow): Product {
       previews: Array.isArray(row.imgs.previews) && row.imgs.previews.length > 0
         ? row.imgs.previews
         : ["/images/rolex.webp"],
+      ...(variants ? { variants } : {}),
     };
   }
 
@@ -60,6 +71,7 @@ export function mapRowToProduct(row: DbProductRow): Product {
     reviews: Number(row.reviews) || 0,
     specs,
     imgs,
+    ...(variants ? { variants } : {}),
   };
 }
 
@@ -177,9 +189,14 @@ export async function createProductInSupabase(
       care_notes: newProduct.careNotes || "",
       reviews: newProduct.reviews || 0,
       specs: newProduct.specs || [],
-      imgs: newProduct.imgs || {
-        thumbnails: ["/images/rolex.webp"],
-        previews: ["/images/rolex.webp"],
+      imgs: {
+        thumbnails: newProduct.imgs?.thumbnails || ["/images/rolex.webp"],
+        previews: newProduct.imgs?.previews || ["/images/rolex.webp"],
+        ...(newProduct.variants && newProduct.variants.length > 0
+          ? { variants: newProduct.variants }
+          : newProduct.imgs?.variants
+          ? { variants: newProduct.imgs.variants }
+          : {}),
       },
       is_active: true,
       updated_at: new Date().toISOString(),
@@ -230,7 +247,21 @@ export async function updateProductInSupabase(
     if (updates.description !== undefined) payload.description = updates.description;
     if (updates.careNotes !== undefined) payload.care_notes = updates.careNotes;
     if (updates.specs !== undefined) payload.specs = updates.specs;
-    if (updates.imgs !== undefined) payload.imgs = updates.imgs;
+    if (updates.imgs !== undefined || updates.variants !== undefined) {
+      const baseImgs: Record<string, any> =
+        updates.imgs && typeof updates.imgs === "object"
+          ? (updates.imgs as Record<string, any>)
+          : {};
+      payload.imgs = {
+        thumbnails: baseImgs.thumbnails || ["/images/rolex.webp"],
+        previews: baseImgs.previews || ["/images/rolex.webp"],
+        ...(updates.variants && updates.variants.length > 0
+          ? { variants: updates.variants }
+          : baseImgs.variants
+          ? { variants: baseImgs.variants }
+          : {}),
+      };
+    }
 
     const { error } = await supabase
       .from("products")

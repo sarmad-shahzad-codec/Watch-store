@@ -37,15 +37,16 @@ type ShopDetailsProps = {
   productId: number;
 };
 
-const DIAL_COLORS = [
+const DEFAULT_DIAL_COLORS = [
   "Black",
-  "Gray",
+  "Blue",
   "Green",
   "White",
-  "Blue",
-  "Tifny",
-  "Texture Gray",
-  "Texture Green",
+  "Gold",
+  "Silver",
+  "Tiffany Blue",
+  "Rose Gold",
+  "Gray",
 ];
 
 const ShopDetails = ({ productId }: ShopDetailsProps) => {
@@ -129,11 +130,47 @@ const ShopDetails = ({ productId }: ShopDetailsProps) => {
   }
 
   const product = fromCatalog;
-  const previews = product.imgs?.previews && product.imgs.previews.length > 0
-    ? product.imgs.previews
-    : ["/images/tissot.webp"];
+  const previews = useMemo(() => {
+    return product.imgs?.previews && product.imgs.previews.length > 0
+      ? product.imgs.previews
+      : ["/images/tissot.webp"];
+  }, [product.imgs?.previews]);
+
+  const activeVariants = useMemo(() => {
+    if (product.variants && product.variants.length > 0) {
+      return product.variants.map((v, i) => ({
+        name: v.name?.trim() || DEFAULT_DIAL_COLORS[i % DEFAULT_DIAL_COLORS.length] || `Option ${i + 1}`,
+        image: v.image || previews[i] || previews[0],
+        index: i,
+      }));
+    }
+    if (previews.length > 1) {
+      return previews.map((img, i) => ({
+        name: DEFAULT_DIAL_COLORS[i % DEFAULT_DIAL_COLORS.length] || `Option ${i + 1}`,
+        image: img,
+        index: i,
+      }));
+    }
+    return [{ name: "Standard Edition", image: previews[0], index: 0 }];
+  }, [product.variants, previews]);
 
   const currentPreview = previews[previewImg] || previews[0];
+
+  useEffect(() => {
+    if (activeVariants.length > 0) {
+      const exists = activeVariants.some((v) => v.name === selectedColor);
+      if (!exists) {
+        setSelectedColor(activeVariants[0].name);
+      }
+    }
+  }, [activeVariants, selectedColor]);
+
+  const handleSelectVariant = (variant: { name: string; image: string; index: number }) => {
+    setSelectedColor(variant.name);
+    if (variant.index >= 0 && variant.index < previews.length) {
+      setPreviewImg(variant.index);
+    }
+  };
 
   const discountPercent =
     product.price > product.discountedPrice
@@ -283,27 +320,42 @@ const ShopDetails = ({ productId }: ShopDetailsProps) => {
                 {/* Thumbnails Strip */}
                 {previews.length > 1 && (
                   <div className="flex items-center gap-3 mt-4 overflow-x-auto pb-2 scrollbar-thin">
-                    {previews.map((thumb, idx) => (
-                      <button
-                        key={idx}
-                        type="button"
-                        onClick={() => setPreviewImg(idx)}
-                        className={`relative flex-shrink-0 w-20 h-20 rounded-xl overflow-hidden bg-[#F7F5F2] border-2 transition-all p-1.5 flex items-center justify-center ${
-                          idx === previewImg
-                            ? "border-black shadow-sm ring-1 ring-black"
-                            : "border-gray-200 hover:border-gray-400 opacity-75 hover:opacity-100"
-                        }`}
-                      >
-                        <Image
-                          src={thumb}
-                          alt={`Thumbnail ${idx + 1}`}
-                          width={70}
-                          height={70}
-                          unoptimized={typeof thumb === "string" && thumb.includes("cloudinary")}
-                          className="object-contain max-h-full w-auto"
-                        />
-                      </button>
-                    ))}
+                    {previews.map((thumb, idx) => {
+                      const variantForThumb = activeVariants[idx];
+                      const isSelected = idx === previewImg;
+                      return (
+                        <button
+                          key={idx}
+                          type="button"
+                          onClick={() => {
+                            setPreviewImg(idx);
+                            if (variantForThumb?.name) {
+                              setSelectedColor(variantForThumb.name);
+                            }
+                          }}
+                          title={variantForThumb?.name ? `View ${variantForThumb.name}` : undefined}
+                          className={`relative flex-shrink-0 w-20 h-20 rounded-xl overflow-hidden bg-[#F7F5F2] border-2 transition-all p-1.5 flex items-center justify-center group ${
+                            isSelected
+                              ? "border-black shadow-sm ring-1 ring-black"
+                              : "border-gray-200 hover:border-gray-400 opacity-75 hover:opacity-100"
+                          }`}
+                        >
+                          <Image
+                            src={thumb}
+                            alt={variantForThumb?.name || `Thumbnail ${idx + 1}`}
+                            width={70}
+                            height={70}
+                            unoptimized={typeof thumb === "string" && thumb.includes("cloudinary")}
+                            className="object-contain max-h-full w-auto transition-transform duration-200 group-hover:scale-105"
+                          />
+                          {variantForThumb?.name && (
+                            <span className="absolute bottom-1 inset-x-1 text-[9px] font-semibold bg-black/75 text-white py-0.5 px-1 rounded text-center truncate pointer-events-none opacity-0 group-hover:opacity-100 transition-opacity">
+                              {variantForThumb.name}
+                            </span>
+                          )}
+                        </button>
+                      );
+                    })}
                   </div>
                 )}
               </div>
@@ -390,26 +442,56 @@ const ShopDetails = ({ productId }: ShopDetailsProps) => {
                   <span>In Stock — Ready for Dispatch</span>
                 </div>
 
-                {/* 6. Dial Color Swatches (Exact Match to Screenshot) */}
+                {/* 6. Dial Color Swatches with Watch Miniatures */}
                 <div className="mb-5">
-                  <div className="text-xs sm:text-sm font-semibold text-gray-900 mb-2.5">
-                    Dial color: <span className="font-normal text-gray-700">{selectedColor}</span>
+                  <div className="flex items-center justify-between mb-2.5">
+                    <div className="text-xs sm:text-sm font-semibold text-gray-900">
+                      Dial color:{" "}
+                      <span className="font-bold text-[#8B6914] bg-[#FAF3E8] px-2 py-0.5 rounded border border-[#EADBBE] text-xs">
+                        {selectedColor}
+                      </span>
+                    </div>
+                    {activeVariants.length > 1 && (
+                      <span className="text-[11px] text-gray-500 font-medium">
+                        {activeVariants.length} Colors Available
+                      </span>
+                    )}
                   </div>
-                  <div className="flex flex-wrap gap-2">
-                    {DIAL_COLORS.map((color) => {
-                      const isSelected = selectedColor === color;
+
+                  <div className="flex flex-wrap gap-2.5">
+                    {activeVariants.map((variant) => {
+                      const isSelected = selectedColor === variant.name;
                       return (
                         <button
-                          key={color}
+                          key={`${variant.name}-${variant.index}`}
                           type="button"
-                          onClick={() => setSelectedColor(color)}
-                          className={`text-xs sm:text-sm px-3.5 py-1.5 rounded-md font-medium transition-all ${
+                          onClick={() => handleSelectVariant(variant)}
+                          className={`group/swatch relative flex items-center gap-2 pl-1.5 pr-3 py-1.5 rounded-lg border-2 text-xs font-semibold transition-all shadow-xs ${
                             isSelected
-                              ? "bg-[#1A1A1A] text-white border border-[#1A1A1A] shadow-sm"
-                              : "bg-white text-gray-800 border border-gray-200 hover:border-gray-400"
+                              ? "bg-[#111111] text-white border-[#111111] ring-2 ring-[#8B6914]/40 shadow-sm"
+                              : "bg-white text-gray-800 border-gray-200 hover:border-gray-400 hover:bg-gray-50/80"
                           }`}
                         >
-                          {color}
+                          {/* Mini Watch Preview Thumbnail */}
+                          <div className="relative w-8 h-8 rounded-md bg-[#F7F5F2] border border-gray-200/80 overflow-hidden flex items-center justify-center flex-shrink-0">
+                            <Image
+                              src={variant.image}
+                              alt={variant.name}
+                              width={32}
+                              height={32}
+                              unoptimized={typeof variant.image === "string" && variant.image.includes("cloudinary")}
+                              className="object-contain max-h-full max-w-full group-hover/swatch:scale-110 transition-transform duration-200"
+                            />
+                          </div>
+
+                          {/* Color Name */}
+                          <span className="tracking-tight text-xs">
+                            {variant.name}
+                          </span>
+
+                          {isSelected && (
+                            <span className="w-1.5 h-1.5 rounded-full bg-[#E5B869] animate-pulse ml-0.5" />
+                          )}
                         </button>
                       );
                     })}
@@ -837,16 +919,23 @@ const ShopDetails = ({ productId }: ShopDetailsProps) => {
               </div>
             </div>
 
-            {/* Center: Dropdown Selector "Black - Rs.2,999.00 ⌵" */}
+            {/* Center: Dropdown Selector with dynamic variants */}
             <div className="hidden sm:block">
               <select
                 value={selectedColor}
-                onChange={(e) => setSelectedColor(e.target.value)}
+                onChange={(e) => {
+                  const found = activeVariants.find((v) => v.name === e.target.value);
+                  if (found) {
+                    handleSelectVariant(found);
+                  } else {
+                    setSelectedColor(e.target.value);
+                  }
+                }}
                 className="bg-white border border-gray-200 rounded-lg px-3 py-2 text-xs sm:text-sm font-medium text-gray-800 cursor-pointer outline-none hover:border-gray-400 focus:border-black"
               >
-                {DIAL_COLORS.map((c) => (
-                  <option key={c} value={c}>
-                    {c} - {formatPkr(product.discountedPrice)}
+                {activeVariants.map((v) => (
+                  <option key={`${v.name}-${v.index}`} value={v.name}>
+                    {v.name} - {formatPkr(product.discountedPrice)}
                   </option>
                 ))}
               </select>

@@ -5,7 +5,7 @@ import Link from "next/link";
 import Image from "next/image";
 import { formatPkr } from "@/lib/formatCurrency";
 import shopData from "@/components/Shop/shopData";
-import { Product } from "@/types/product";
+import { Product, ProductColorVariant } from "@/types/product";
 import {
   fetchProductsFromSupabase,
   updateProductPriceInSupabase,
@@ -53,13 +53,16 @@ const BRAND_PRESETS = [
 ];
 
 const CATEGORY_PRESETS = [
+  "New In",
+  "Men's Collection",
+  "Women's Collection",
+  "Watch Accessories",
   "Men's Automatic Watches",
   "Chronograph Sport",
   "Diamond Bezel Luxury",
   "Diver Luxury Watches",
   "Classic Dress Watches",
   "Prestige Haute Horlogerie",
-  "Women's Luxury",
   "Automatic Skeleton",
 ];
 
@@ -99,6 +102,7 @@ export default function AdminProductsPage() {
   const [newPackingCost, setNewPackingCost] = useState<number | "">(150);
   const [newDeliveryCost, setNewDeliveryCost] = useState<number | "">(250);
   const [newImgUrls, setNewImgUrls] = useState<string[]>([""]);
+  const [newVariants, setNewVariants] = useState<ProductColorVariant[]>([]);
   const [newDescription, setNewDescription] = useState("");
   const [newCaseDiameter, setNewCaseDiameter] = useState("41 mm");
   const [newMovement, setNewMovement] = useState("Automatic Mechanical Movement");
@@ -118,6 +122,7 @@ export default function AdminProductsPage() {
   const [editPackingCost, setEditPackingCost] = useState<number | "">(150);
   const [editDeliveryCost, setEditDeliveryCost] = useState<number | "">(250);
   const [editImgUrls, setEditImgUrls] = useState<string[]>([""]);
+  const [editVariants, setEditVariants] = useState<ProductColorVariant[]>([]);
   const [editDescription, setEditDescription] = useState("");
   const [editLoading, setEditLoading] = useState(false);
 
@@ -402,7 +407,9 @@ export default function AdminProductsPage() {
       imgs: {
         thumbnails: finalImgs,
         previews: finalImgs,
+        variants: newVariants,
       },
+      variants: newVariants,
     };
 
     const res = await createProductInSupabase(newProdPayload);
@@ -429,6 +436,7 @@ export default function AdminProductsPage() {
       setNewPackingCost(150);
       setNewDeliveryCost(250);
       setNewImgUrls([""]);
+      setNewVariants([]);
       setNewDescription("");
       setNewCategoryInput("");
       setCustomCategory("");
@@ -456,6 +464,13 @@ export default function AdminProductsPage() {
       ? p.imgs.thumbnails
       : [];
     setEditImgUrls(existingImgs.length > 0 ? existingImgs : [""]);
+    setEditVariants(
+      p.variants && p.variants.length > 0
+        ? p.variants
+        : p.imgs?.variants && p.imgs.variants.length > 0
+        ? p.imgs.variants
+        : []
+    );
     setEditDescription(p.description);
   };
 
@@ -486,7 +501,9 @@ export default function AdminProductsPage() {
       imgs: {
         thumbnails: finalImgs,
         previews: finalImgs,
+        variants: editVariants,
       },
+      variants: editVariants,
     };
 
     const res = await updateProductInSupabase(editingProduct.id, updates);
@@ -1084,12 +1101,14 @@ export default function AdminProductsPage() {
                 </div>
               </div>
 
-              {/* 3. Cloudinary Picture Upload / Multi-Image URLs */}
+              {/* 3. Cloudinary Picture Upload & Watch Color Variants */}
               <AdminMultiImageInput
                 urls={newImgUrls}
                 onChange={setNewImgUrls}
+                variants={newVariants}
+                onVariantsChange={setNewVariants}
                 presets={IMAGE_PRESETS}
-                title="3. Product Pictures (Multiple Cloudinary URLs)"
+                title="3. Watch Pictures & Color Variants"
               />
 
               {/* 4. Pricing & Full Economics (Selling Price, Compare-At, Cost, Packing, Delivery) */}
@@ -1458,12 +1477,14 @@ export default function AdminProductsPage() {
                 </div>
               </div>
 
-              {/* Product Pictures (Multiple Cloudinary URLs) */}
+              {/* Product Pictures & Watch Color Variants */}
               <AdminMultiImageInput
                 urls={editImgUrls}
                 onChange={setEditImgUrls}
+                variants={editVariants}
+                onVariantsChange={setEditVariants}
                 presets={IMAGE_PRESETS}
-                title="Product Pictures (Multiple Cloudinary URLs)"
+                title="Watch Pictures & Color Variants"
               />
 
               {/* Pricing & Costs */}

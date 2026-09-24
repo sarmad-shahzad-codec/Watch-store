@@ -29,8 +29,8 @@ export default function InstagramFeed() {
   }
 
   const posts = settings?.posts || [];
-  const handle = settings?.handle || "@gloriatimes.pk";
-  const profileUrl = settings?.profile_url || "https://www.instagram.com/gloriatimes.pk";
+  const handle = settings?.handle || "@gloriatimes_";
+  const profileUrl = settings?.profile_url || "https://www.instagram.com/gloriatimes_/?hl=en";
 
   return (
     <section className="w-full bg-[#FAF8F5] border-t border-[#EDE4D8] py-14 sm:py-16">
@@ -45,7 +45,7 @@ export default function InstagramFeed() {
             {settings?.title || "Follow Us On Instagram"}
           </h2>
           <p className="mt-2 text-xs sm:text-sm text-[#6B5344] leading-relaxed">
-            {settings?.subtitle || "Tag @gloriatimes to be featured in our timepiece connoisseurs collection."}
+            {settings?.subtitle || "Tag @gloriatimes_ to be featured in our timepiece connoisseurs collection."}
           </p>
           <div className="mt-3">
             <a

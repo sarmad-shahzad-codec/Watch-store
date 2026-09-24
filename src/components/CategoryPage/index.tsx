@@ -22,6 +22,14 @@ const BRAND_CONFIG: Record<
     isComingSoon?: boolean;
   }
 > = {
+  "new-in": {
+    name: "New In Collection",
+    brandKey: "new-in",
+    tagline: "Latest 2026 Releases, Fresh Drops & Masterpiece Arrivals",
+    description:
+      "Exclusive preview of our upcoming 2026 timepiece drops. The new collection is currently in final staging and arriving soon at Gloria Times Boutique.",
+    isComingSoon: true,
+  },
   women: {
     name: "Women's Collection",
     brandKey: "women",
@@ -155,15 +163,34 @@ export default function CategoryPageComponent({ slug }: CategoryPageProps) {
 
   const isComingSoon = Boolean(
     brandInfo.isComingSoon ||
-    ["women", "accessories", "watch-boxes", "tool-kits", "straps"].includes(normalizedSlug)
+    ["women", "new-in", "newin", "accessories", "watch-boxes", "tool-kits", "straps"].includes(normalizedSlug)
   );
 
-  // Filter products for category (distinct accessories or men/women per slug)
+  // Filter products for category (distinct accessories or men/women/new-in per slug)
   const categoryProducts = useMemo(() => {
     const clean = (s: string) => s.toLowerCase().replace(/[^a-z0-9]/g, "");
 
     if (normalizedSlug === "women") {
-      return [];
+      const womenItems = products.filter((p) => {
+        const cat = clean(p.category || "");
+        const title = clean(p.title || "");
+        return cat.includes("women") || cat.includes("ladies") || title.includes("women");
+      });
+      return womenItems;
+    }
+
+    if (normalizedSlug === "new-in" || normalizedSlug === "newin") {
+      const newInItems = products.filter((p) => {
+        const cat = clean(p.category || "");
+        const title = clean(p.title || "");
+        return (
+          cat.includes("newin") ||
+          cat.includes("newarrival") ||
+          cat.includes("newarrivals") ||
+          title.includes("new in")
+        );
+      });
+      return newInItems;
     }
 
     if (normalizedSlug === "men") {
@@ -258,7 +285,7 @@ export default function CategoryPageComponent({ slug }: CategoryPageProps) {
                 {brandInfo.description}
               </p>
 
-              {/* Coming Soon Staging Banner for Women & Accessories */}
+              {/* Coming Soon Staging Banner for Women, New In & Accessories */}
               {isComingSoon && (
                 <div className="mt-5 p-4 sm:p-5 rounded-2xl bg-[#0B0F19] border border-[#F2C27B]/30 text-white shadow-xl flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
                   <div>
@@ -267,12 +294,16 @@ export default function CategoryPageComponent({ slug }: CategoryPageProps) {
                       <span>
                         {normalizedSlug === "women"
                           ? "COMING SOON — WOMEN'S LUXURY COLLECTION"
+                          : normalizedSlug === "new-in" || normalizedSlug === "newin"
+                          ? "COMING SOON — 2026 NEW IN TIMEPIECE DROPS"
                           : "COMING SOON — OFFICIAL ACCESSORY DROP"}
                       </span>
                     </div>
                     <p className="text-xs sm:text-sm text-gray-300 mt-1 leading-relaxed">
                       {normalizedSlug === "women"
                         ? "Our master-crafted women's timepiece catalog is currently in final staging. Pre-order inquiries and stock reservations are open via WhatsApp."
+                        : normalizedSlug === "new-in" || normalizedSlug === "newin"
+                        ? "The newest 2026 luxury releases and limited editions are currently in final staging. Pre-order inquiries and early-bird reservations are open via WhatsApp."
                         : "Our master-crafted accessory line is currently in final staging. Pre-order inquiries and stock reservations are open via WhatsApp."}
                     </p>
                   </div>
@@ -363,11 +394,15 @@ export default function CategoryPageComponent({ slug }: CategoryPageProps) {
                   >
                     {normalizedSlug === "women"
                       ? "Women's Luxury Timepieces — Launching Soon"
+                      : normalizedSlug === "new-in" || normalizedSlug === "newin"
+                      ? "New In 2026 Drops — Launching Soon"
                       : `${brandInfo.name} Launching Soon`}
                   </h3>
                   <p className="text-sm text-gray-600 mb-6 max-w-md mx-auto leading-relaxed">
                     {normalizedSlug === "women"
                       ? "Our curated collection of dainty dials, diamond-bezel pieces, and Parisian classics for her is in final staging. Pre-order inquiries and stock reservations are open now."
+                      : normalizedSlug === "new-in" || normalizedSlug === "newin"
+                      ? "Brand new 2026 master-quality additions and limited release models are being cataloged. Reserve early access via WhatsApp concierge."
                       : "Stock arrives shortly. Contact our concierge on WhatsApp to pre-order or get notified first."}
                   </p>
                   <div className="flex flex-wrap items-center justify-center gap-3">
@@ -399,8 +434,8 @@ export default function CategoryPageComponent({ slug }: CategoryPageProps) {
                   </div>
                 </div>
 
-                {/* Sneak peek preview for women */}
-                {normalizedSlug === "women" && (
+                {/* Sneak peek preview for women and new-in */}
+                {(normalizedSlug === "women" || normalizedSlug === "new-in" || normalizedSlug === "newin") && (
                   <div className="mt-14 max-w-4xl mx-auto">
                     <div className="text-center mb-8">
                       <span className="text-xs uppercase tracking-[0.2em] font-semibold text-[#8A7A5C]">
@@ -410,23 +445,39 @@ export default function CategoryPageComponent({ slug }: CategoryPageProps) {
                         className="text-xl sm:text-2xl font-semibold text-[#1C1C1B] mt-1"
                         style={{ fontFamily: "'Cormorant Garamond', Georgia, serif" }}
                       >
-                        Upcoming Timepieces in Final Staging
+                        {normalizedSlug === "women"
+                          ? "Upcoming Timepieces in Final Staging"
+                          : "Upcoming 2026 Master Quality Arrivals"}
                       </h4>
                     </div>
 
                     <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
-                      {[
-                        {
-                          title: "Cartier Santos Demoiselle",
-                          sub: "Parisian Roman Numerals · Sapphire Crown",
-                          img: "/images/2s/cartier-tank-1.jpg",
-                        },
-                        {
-                          title: "Cartier Tank Française Gold Accents",
-                          sub: "Curved Ergonomic Case · 2-Tone Steel",
-                          img: "/images/2s/cartier-tank-2.jpg",
-                        },
-                      ].map((item, idx) => (
+                      {(normalizedSlug === "women"
+                        ? [
+                            {
+                              title: "Cartier Santos Demoiselle",
+                              sub: "Parisian Roman Numerals · Sapphire Crown",
+                              img: "/images/2s/cartier-tank-1.jpg",
+                            },
+                            {
+                              title: "Cartier Tank Française Gold Accents",
+                              sub: "Curved Ergonomic Case · 2-Tone Steel",
+                              img: "/images/2s/cartier-tank-2.jpg",
+                            },
+                          ]
+                        : [
+                            {
+                              title: "Patek Philippe Grand Complication",
+                              sub: "Master Calibre Automatic · Exhibition Back",
+                              img: "/images/2s/patek-auto-1.jpg",
+                            },
+                            {
+                              title: "Rolex Cosmograph Daytona Master Edition",
+                              sub: "Cerachrom Tachymeter · Tri-Compax Chrono",
+                              img: "/images/2s/rolex-daytona-1.jpg",
+                            },
+                          ]
+                      ).map((item, idx) => (
                         <div
                           key={idx}
                           className="group relative overflow-hidden rounded-xl border border-[#D9D4CC] bg-[#FAF8F5] p-5 flex items-center gap-5 shadow-xs hover:shadow-md transition"

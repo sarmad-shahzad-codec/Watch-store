@@ -12,6 +12,7 @@ import {
   X,
   Menu,
   ArrowRight,
+  Instagram,
 } from "lucide-react";
 import { useAppSelector } from "@/redux/store";
 import { useCartModalContext } from "@/app/context/CartSidebarModalContext";
@@ -150,7 +151,7 @@ const Header = () => {
     { name: "Men", href: "/category/men" },
     { name: "Women", href: "/category/women" },
     { name: "Collections", href: "/shop-without-sidebar" },
-    { name: "New In", href: "/shop-without-sidebar?sort=newest" },
+    { name: "New In", href: "/category/new-in" },
     { name: "Accessories", href: "/category/accessories" },
   ];
 
@@ -485,7 +486,29 @@ const Header = () => {
               </nav>
             </div>
 
-            <div className="pt-6 border-t border-[#D9D4CC]">
+            <div className="pt-6 border-t border-[#D9D4CC] flex flex-col items-center gap-3">
+              <div className="flex items-center gap-3">
+                <a
+                  href="https://www.instagram.com/gloriatimes_/?hl=en"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-white border border-[#D9D4CC] text-xs font-semibold text-[#1C1C1B] hover:bg-[#1C1C1B] hover:text-white transition shadow-xs"
+                >
+                  <Instagram className="w-3.5 h-3.5" />
+                  <span>Instagram</span>
+                </a>
+                <a
+                  href="https://www.tiktok.com/@gloriatimes"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-white border border-[#D9D4CC] text-xs font-semibold text-[#1C1C1B] hover:bg-[#1C1C1B] hover:text-white transition shadow-xs"
+                >
+                  <svg className="w-3.5 h-3.5 fill-current" viewBox="0 0 24 24">
+                    <path d="M19.589 6.686a4.793 4.793 0 0 1-3.77-4.245V2h-3.445v13.672a2.896 2.896 0 0 1-2.903 2.894 2.895 2.895 0 0 1-2.894-2.894 2.895 2.895 0 0 1 2.894-2.894c.31 0 .607.05.886.138V9.387a6.327 6.327 0 0 0-.886-.062A6.338 6.338 0 0 0 3 15.663a6.338 6.338 0 0 0 6.338 6.337 6.338 6.338 0 0 0 6.338-6.337V8.583a8.175 8.175 0 0 0 4.913 1.636V6.784a4.83 4.83 0 0 1-1-.098z" />
+                  </svg>
+                  <span>TikTok</span>
+                </a>
+              </div>
               <p className="text-xs text-[#8E887F] text-center">
                 Gloria Times · Fine Watches of Distinction
               </p>

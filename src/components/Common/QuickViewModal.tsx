@@ -12,15 +12,16 @@ import { formatPkr } from "@/lib/formatCurrency";
 import { updateproductDetails } from "@/redux/features/product-details";
 import { X, ChevronLeft, ChevronRight, Check } from "lucide-react";
 
-const DIAL_COLORS = [
+const DEFAULT_DIAL_COLORS = [
   "Black",
-  "Gray",
+  "Blue",
   "Green",
   "White",
-  "Blue",
-  "Tifny",
-  "Texture Gray",
-  "Texture Green",
+  "Gold",
+  "Silver",
+  "Tiffany Blue",
+  "Rose Gold",
+  "Gray",
 ];
 
 const QuickViewModal = () => {
@@ -41,7 +42,42 @@ const QuickViewModal = () => {
       ? product.imgs.previews
       : ["/images/tissot.webp"];
 
+  const activeVariants = React.useMemo(() => {
+    if (!product) return [];
+    if (product.variants && product.variants.length > 0) {
+      return product.variants.map((v, i) => ({
+        name: v.name?.trim() || DEFAULT_DIAL_COLORS[i % DEFAULT_DIAL_COLORS.length] || `Option ${i + 1}`,
+        image: v.image || previews[i] || previews[0],
+        index: i,
+      }));
+    }
+    if (previews.length > 1) {
+      return previews.map((img, i) => ({
+        name: DEFAULT_DIAL_COLORS[i % DEFAULT_DIAL_COLORS.length] || `Option ${i + 1}`,
+        image: img,
+        index: i,
+      }));
+    }
+    return [{ name: "Standard Edition", image: previews[0], index: 0 }];
+  }, [product, previews]);
+
   const currentImage = previews[activePreview] || previews[0] || "/images/tissot.webp";
+
+  useEffect(() => {
+    if (activeVariants.length > 0) {
+      const match = activeVariants.find((v) => v.name === selectedColor);
+      if (!match) {
+        setSelectedColor(activeVariants[0].name);
+      }
+    }
+  }, [activeVariants, selectedColor]);
+
+  const handleSelectVariant = (variant: { name: string; image: string; index: number }) => {
+    setSelectedColor(variant.name);
+    if (variant.index >= 0 && variant.index < previews.length) {
+      setActivePreview(variant.index);
+    }
+  };
 
   const discountPercent =
     product && product.price > product.discountedPrice
@@ -59,6 +95,7 @@ const QuickViewModal = () => {
   const handleAddToCart = () => {
     addToCart({
       ...product,
+      title: `${product.title} - ${selectedColor}`,
       quantity,
     });
     setAdded(true);
@@ -71,6 +108,7 @@ const QuickViewModal = () => {
   const handleBuyNow = () => {
     addToCart({
       ...product,
+      title: `${product.title} - ${selectedColor}`,
       quantity,
     });
     closeModal();
@@ -199,27 +237,49 @@ const QuickViewModal = () => {
                 </div>
               )}
 
-              {/* Dial Color Selector */}
+              {/* Dial Color Selector with Mini Watch Thumbnails */}
               <div className="mb-5">
-                <div className="text-xs sm:text-sm font-medium text-[#111] mb-2.5">
-                  Dial color:{" "}
-                  <span className="font-semibold">{selectedColor}</span>
+                <div className="flex items-center justify-between mb-2">
+                  <div className="text-xs sm:text-sm font-medium text-[#111]">
+                    Dial color:{" "}
+                    <span className="font-bold text-[#8B6914] bg-[#FAF3E8] px-2 py-0.5 rounded border border-[#EADBBE] text-xs">
+                      {selectedColor}
+                    </span>
+                  </div>
+                  {activeVariants.length > 1 && (
+                    <span className="text-[11px] text-gray-500 font-medium">
+                      {activeVariants.length} Colors
+                    </span>
+                  )}
                 </div>
                 <div className="flex flex-wrap gap-2">
-                  {DIAL_COLORS.map((color) => {
-                    const isSelected = selectedColor === color;
+                  {activeVariants.map((variant) => {
+                    const isSelected = selectedColor === variant.name;
                     return (
                       <button
-                        key={color}
+                        key={`${variant.name}-${variant.index}`}
                         type="button"
-                        onClick={() => setSelectedColor(color)}
-                        className={`text-xs px-3.5 py-1.5 rounded-md font-medium transition-all ${
+                        onClick={() => handleSelectVariant(variant)}
+                        className={`group/swatch relative flex items-center gap-1.5 pl-1.5 pr-2.5 py-1 rounded-lg border-2 text-xs font-semibold transition-all ${
                           isSelected
-                            ? "bg-[#1E1E1E] text-white shadow-sm"
-                            : "bg-white text-gray-700 border border-gray-200 hover:border-gray-400"
+                            ? "bg-[#1E1E1E] text-white border-[#1E1E1E] ring-2 ring-[#8B6914]/40 shadow-sm"
+                            : "bg-white text-gray-700 border-gray-200 hover:border-gray-400 hover:bg-gray-50"
                         }`}
                       >
-                        {color}
+                        <div className="relative w-6 h-6 rounded bg-[#F7F5F2] border border-gray-200/80 overflow-hidden flex items-center justify-center flex-shrink-0">
+                          <Image
+                            src={variant.image}
+                            alt={variant.name}
+                            width={24}
+                            height={24}
+                            unoptimized={typeof variant.image === "string" && variant.image.includes("cloudinary")}
+                            className="object-contain max-h-full max-w-full group-hover/swatch:scale-110 transition-transform"
+                          />
+                        </div>
+                        <span className="truncate">{variant.name}</span>
+                        {isSelected && (
+                          <span className="w-1.5 h-1.5 rounded-full bg-[#E5B869] animate-pulse ml-0.5" />
+                        )}
                       </button>
                     );
                   })}

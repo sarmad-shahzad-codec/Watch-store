@@ -42,10 +42,10 @@ export default function AdminInstagramPage() {
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
 
-  const [profileUrl, setProfileUrl] = useState("https://www.instagram.com/gloriatimes.pk");
-  const [handle, setHandle] = useState("@gloriatimes.pk");
+  const [profileUrl, setProfileUrl] = useState("https://www.instagram.com/gloriatimes_/?hl=en");
+  const [handle, setHandle] = useState("@gloriatimes_");
   const [title, setTitle] = useState("Follow Us On Instagram");
-  const [subtitle, setSubtitle] = useState("Tag @gloriatimes to be featured in our luxury timepiece gallery");
+  const [subtitle, setSubtitle] = useState("Tag @gloriatimes_ to be featured in our luxury timepiece gallery");
   const [enabled, setEnabled] = useState(true);
   const [posts, setPosts] = useState<InstagramPost[]>([]);
 

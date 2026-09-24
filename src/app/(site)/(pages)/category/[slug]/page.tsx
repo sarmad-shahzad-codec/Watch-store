@@ -11,7 +11,7 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
     .replace(/-/g, " ")
     .replace(/\b\w/g, (char) => char.toUpperCase());
 
-  const isComingSoon = ["women", "accessories", "watch-boxes", "tool-kits", "straps"].includes(slug.toLowerCase());
+  const isComingSoon = ["women", "new-in", "newin", "accessories", "watch-boxes", "tool-kits", "straps"].includes(slug.toLowerCase());
 
   if (isComingSoon) {
     return {
