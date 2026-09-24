@@ -1,0 +1,47 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" width="512" height="512">
+  <defs>
+    <linearGradient id="bgGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#1A2834" />
+      <stop offset="100%" stop-color="#0B141C" />
+    </linearGradient>
+    <linearGradient id="goldGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#E5C788" />
+      <stop offset="50%" stop-color="#C5A880" />
+      <stop offset="100%" stop-color="#9A7840" />
+    </linearGradient>
+    <radialGradient id="dialGlow" cx="50%" cy="50%" r="50%">
+      <stop offset="0%" stop-color="#243747" stop-opacity="0.4" />
+      <stop offset="100%" stop-color="#0B141C" stop-opacity="0" />
+    </radialGradient>
+  </defs>
+
+  <!-- Luxury Squircle Outer Container -->
+  <rect width="512" height="512" rx="112" fill="url(#bgGrad)" />
+  <rect width="506" height="506" x="3" y="3" rx="109" fill="none" stroke="url(#goldGrad)" stroke-width="4" stroke-opacity="0.35" />
+  
+  <circle cx="256" cy="256" r="180" fill="url(#dialGlow)" />
+
+  <!-- Gloria Watch Face (Centered & Scaled) -->
+  <g transform="translate(256, 256) scale(3.5) translate(-50, -52)">
+    <!-- Watch Case / Outer Ring -->
+    <path fill="#FDF8F0" fill-rule="evenodd" d="M 50 2 A 47 50 0 1 0 50.001 2 Z M 50 6.5 A 37 45.5 0 1 1 49.999 6.5 Z" />
+    
+    <!-- 12 O'Clock Index Marker -->
+    <rect x="48.2" y="11" width="3.6" height="9" rx="1.2" fill="url(#goldGrad)" />
+    
+    <!-- 3, 6, 9 O'Clock Markers -->
+    <circle cx="82" cy="52" r="3.2" fill="url(#goldGrad)" />
+    <circle cx="50" cy="90" r="3.2" fill="url(#goldGrad)" />
+    <circle cx="18" cy="52" r="3.2" fill="url(#goldGrad)" />
+    
+    <!-- Hour Hand (Ivory) -->
+    <path fill="#FDF8F0" d="M 33 42.5 L 51.6 49 L 55 55 L 48 55.5 Z" />
+    
+    <!-- Minute Hand (Rich Gold) -->
+    <path fill="url(#goldGrad)" d="M 74 37 L 51.2 54.1 L 45 54.5 L 48.5 49 Z" />
+    
+    <!-- Center Pinion -->
+    <circle cx="50" cy="52" r="4.5" fill="url(#goldGrad)" />
+    <circle cx="50" cy="52" r="1.8" fill="#10202B" />
+  </g>
+</svg>

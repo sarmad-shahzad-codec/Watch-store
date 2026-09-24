@@ -18,6 +18,34 @@ import { useCartModalContext } from "@/app/context/CartSidebarModalContext";
 import { useStoreProducts } from "@/hooks/useProducts";
 import GloriaLogo from "@/components/Common/GloriaLogo";
 
+const ANNOUNCEMENTS = [
+  {
+    text: "Premium Master Quality Luxury Watches",
+    highlight: "1:1 Swiss Grade",
+    href: "/shop-without-sidebar",
+  },
+  {
+    text: "Fast & Free Nationwide Delivery Across Pakistan",
+    highlight: "Express Shipping",
+    href: "/shop-without-sidebar",
+  },
+  {
+    text: "Cash On Delivery (COD) Available Nationwide",
+    highlight: "Pay at Doorstep",
+    href: "/shop-without-sidebar",
+  },
+  {
+    text: "Open Parcel Verification Allowed Before Payment",
+    highlight: "100% Safe Purchase",
+    href: "/shop-without-sidebar",
+  },
+  {
+    text: "1-Year Movement Warranty & 24h Replacement",
+    highlight: "Guaranteed Authenticity",
+    href: "/shop-without-sidebar",
+  },
+];
+
 const Header = () => {
   const pathname = usePathname();
   const router = useRouter();
@@ -131,18 +159,30 @@ const Header = () => {
       className="fixed left-0 top-0 z-9999 w-full select-none"
       ref={searchContainerRef}
     >
-      {/* 1. Top Announcement Bar matching artifact style */}
-      <div className="h-8 sm:h-9 bg-[#1C1C1B] text-[#E9E5DE] flex items-center justify-center px-4 text-[12px] sm:text-[13px] font-normal tracking-wide transition-colors">
-        <div className="flex items-center gap-2">
-          <span>New arrivals are here</span>
-          <span className="text-[#C5A880]">·</span>
-          <Link
-            href="/shop-without-sidebar"
-            className="text-[#E9E5DE] hover:text-[#C5A880] font-semibold underline underline-offset-4 decoration-[#C5A880]/50 transition-colors"
-          >
-            Shop now
-          </Link>
+      {/* 1. Top Moving Announcement Bar (Continuous Luxury Ticker) */}
+      <div className="relative h-8 sm:h-9 bg-[#1C1C1B] text-[#E9E5DE] overflow-hidden flex items-center border-b border-black/30">
+        {/* Left Edge Gradient Fade */}
+        <div className="pointer-events-none absolute left-0 top-0 bottom-0 w-8 sm:w-16 bg-gradient-to-r from-[#1C1C1B] to-transparent z-10" />
+
+        {/* Continuous Animated Marquee Ticker */}
+        <div className="animate-announcement-scroll flex items-center">
+          {[...ANNOUNCEMENTS, ...ANNOUNCEMENTS].map((item, idx) => (
+            <Link
+              key={idx}
+              href={item.href}
+              className="inline-flex items-center gap-2.5 px-6 sm:px-10 text-[11px] sm:text-[12px] font-medium tracking-[0.12em] uppercase text-[#E9E5DE] hover:text-[#C5A880] transition-colors shrink-0 group"
+            >
+              <span className="text-[#C5A880] text-[10px] group-hover:scale-125 transition-transform">✦</span>
+              <span>{item.text}</span>
+              <span className="text-[#C5A880] font-semibold text-[10px] sm:text-[11px] px-2 py-0.5 rounded bg-white/5 border border-[#C5A880]/30 tracking-wider">
+                {item.highlight}
+              </span>
+            </Link>
+          ))}
         </div>
+
+        {/* Right Edge Gradient Fade */}
+        <div className="pointer-events-none absolute right-0 top-0 bottom-0 w-8 sm:w-16 bg-gradient-to-l from-[#1C1C1B] to-transparent z-10" />
       </div>
 
       {/* 2. Main Luxury Header matching artifact */}

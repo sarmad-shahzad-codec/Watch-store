@@ -14,6 +14,7 @@ import {
   deleteProductFromSupabase,
 } from "@/utils/supabase/products";
 import { refreshCachedProducts } from "@/hooks/useProducts";
+import AdminMultiImageInput from "@/components/Admin/AdminMultiImageInput";
 import {
   Plus,
   Search,
@@ -97,8 +98,7 @@ export default function AdminProductsPage() {
   const [newCostPrice, setNewCostPrice] = useState<number | "">("");
   const [newPackingCost, setNewPackingCost] = useState<number | "">(150);
   const [newDeliveryCost, setNewDeliveryCost] = useState<number | "">(250);
-  const [newImgUrl, setNewImgUrl] = useState("");
-  const [newGalleryUrl, setNewGalleryUrl] = useState("");
+  const [newImgUrls, setNewImgUrls] = useState<string[]>([""]);
   const [newDescription, setNewDescription] = useState("");
   const [newCaseDiameter, setNewCaseDiameter] = useState("41 mm");
   const [newMovement, setNewMovement] = useState("Automatic Mechanical Movement");
@@ -117,7 +117,7 @@ export default function AdminProductsPage() {
   const [editCostPrice, setEditCostPrice] = useState<number | "">("");
   const [editPackingCost, setEditPackingCost] = useState<number | "">(150);
   const [editDeliveryCost, setEditDeliveryCost] = useState<number | "">(250);
-  const [editImgUrl, setEditImgUrl] = useState("");
+  const [editImgUrls, setEditImgUrls] = useState<string[]>([""]);
   const [editDescription, setEditDescription] = useState("");
   const [editLoading, setEditLoading] = useState(false);
 
@@ -374,8 +374,8 @@ export default function AdminProductsPage() {
     if (!categoriesList.some((c) => c.toLowerCase() === finalCategory.toLowerCase())) {
       saveCategories([...categoriesList, finalCategory]);
     }
-    const primaryImg = newImgUrl.trim() || "/images/gloria/tissot-hero.jpg";
-    const galleryImg = newGalleryUrl.trim() || primaryImg;
+    const validImgs = newImgUrls.map((u) => u.trim()).filter((u) => u.length > 0);
+    const finalImgs = validImgs.length > 0 ? validImgs : ["/images/gloria/tissot-hero.jpg"];
 
     const newProdPayload = {
       title: newTitle.trim(),
@@ -400,8 +400,8 @@ export default function AdminProductsPage() {
         { label: "Case material", value: "Stainless steel" },
       ],
       imgs: {
-        thumbnails: [primaryImg, galleryImg],
-        previews: [primaryImg, galleryImg],
+        thumbnails: finalImgs,
+        previews: finalImgs,
       },
     };
 
@@ -428,8 +428,7 @@ export default function AdminProductsPage() {
       setNewCostPrice("");
       setNewPackingCost(150);
       setNewDeliveryCost(250);
-      setNewImgUrl("");
-      setNewGalleryUrl("");
+      setNewImgUrls([""]);
       setNewDescription("");
       setNewCategoryInput("");
       setCustomCategory("");
@@ -451,7 +450,12 @@ export default function AdminProductsPage() {
     setEditCostPrice(p.costPrice || 0);
     setEditPackingCost(p.packingCost ?? 150);
     setEditDeliveryCost(p.deliveryCost ?? 250);
-    setEditImgUrl(p.imgs?.thumbnails?.[0] || "");
+    const existingImgs = p.imgs?.previews?.length
+      ? p.imgs.previews
+      : p.imgs?.thumbnails?.length
+      ? p.imgs.thumbnails
+      : [];
+    setEditImgUrls(existingImgs.length > 0 ? existingImgs : [""]);
     setEditDescription(p.description);
   };
 
@@ -461,7 +465,14 @@ export default function AdminProductsPage() {
     if (!editingProduct) return;
 
     setEditLoading(true);
-    const primaryImg = editImgUrl.trim() || editingProduct.imgs?.thumbnails?.[0] || "/images/rolex.webp";
+    const validImgs = editImgUrls.map((u) => u.trim()).filter((u) => u.length > 0);
+    const finalImgs =
+      validImgs.length > 0
+        ? validImgs
+        : editingProduct.imgs?.thumbnails?.length
+        ? editingProduct.imgs.thumbnails
+        : ["/images/rolex.webp"];
+
     const updates: Partial<Product> = {
       title: editTitle.trim(),
       brand: editBrand.trim(),
@@ -473,8 +484,8 @@ export default function AdminProductsPage() {
       deliveryCost: Number(editDeliveryCost),
       description: editDescription.trim(),
       imgs: {
-        thumbnails: [primaryImg, primaryImg],
-        previews: [primaryImg, primaryImg],
+        thumbnails: finalImgs,
+        previews: finalImgs,
       },
     };
 
@@ -1073,86 +1084,13 @@ export default function AdminProductsPage() {
                 </div>
               </div>
 
-              {/* 3. Cloudinary Picture Upload / URL */}
-              <div className="space-y-3 p-4 rounded-xl bg-[#FAF8F5] border border-gray-200">
-                <label className="block text-xs font-bold uppercase tracking-wider text-gray-800 flex items-center justify-between">
-                  <span className="flex items-center gap-1.5">
-                    <ImageIcon className="w-4 h-4 text-[#008060]" />
-                    3. Product Picture (Cloudinary URL)
-                  </span>
-                  <span className="text-[11px] font-normal text-[#6B5344]">Paste your Cloudinary image link</span>
-                </label>
-
-                <div className="flex flex-col sm:flex-row items-start gap-4">
-                  {/* Live High-Res Image Preview */}
-                  <div className="w-24 h-24 rounded-xl bg-white border border-gray-300 overflow-hidden shrink-0 flex items-center justify-center relative shadow-inner">
-                    {newImgUrl.trim() ? (
-                      <Image
-                        src={newImgUrl.trim()}
-                        alt="Preview"
-                        width={96}
-                        height={96}
-                        unoptimized
-                        className="object-contain w-full h-full p-1"
-                        onError={(e) => {
-                          // Fallback to placeholder if url is broken
-                          (e.target as any).src = "/images/rolex.webp";
-                        }}
-                      />
-                    ) : (
-                      <div className="text-center p-2">
-                        <ImageIcon className="w-6 h-6 mx-auto text-gray-300 mb-1" />
-                        <span className="text-[9px] text-gray-400 block">No Image</span>
-                      </div>
-                    )}
-                  </div>
-
-                  {/* URL Inputs */}
-                  <div className="flex-1 w-full space-y-2">
-                    <div>
-                      <input
-                        type="url"
-                        placeholder="Paste Cloudinary URL (e.g. https://res.cloudinary.com/.../watch.jpg)"
-                        value={newImgUrl}
-                        onChange={(e) => setNewImgUrl(e.target.value)}
-                        className="w-full px-3.5 py-2 text-xs sm:text-sm rounded-lg border border-gray-300 bg-white focus:outline-none focus:ring-2 focus:ring-[#008060]/30"
-                      />
-                      <span className="text-[10px] text-gray-500 block mt-1">
-                        Primary picture shown on storefront catalog and product cards.
-                      </span>
-                    </div>
-
-                    <div>
-                      <input
-                        type="url"
-                        placeholder="Secondary gallery / dial picture URL (optional)"
-                        value={newGalleryUrl}
-                        onChange={(e) => setNewGalleryUrl(e.target.value)}
-                        className="w-full px-3.5 py-1.5 text-xs rounded-lg border border-gray-300 bg-white focus:outline-none focus:ring-2 focus:ring-[#008060]/30"
-                      />
-                    </div>
-
-                    {/* Quick Presets */}
-                    <div className="flex flex-wrap items-center gap-1.5 pt-1">
-                      <span className="text-[10px] text-gray-500 font-medium">Or choose existing preset:</span>
-                      {IMAGE_PRESETS.map((preset) => (
-                        <button
-                          key={preset.label}
-                          type="button"
-                          onClick={() => setNewImgUrl(preset.url)}
-                          className={`text-[10px] px-2 py-0.5 rounded border transition ${
-                            newImgUrl === preset.url
-                              ? "bg-black text-white border-black"
-                              : "bg-white text-gray-700 border-gray-200 hover:border-gray-400"
-                          }`}
-                        >
-                          {preset.label}
-                        </button>
-                      ))}
-                    </div>
-                  </div>
-                </div>
-              </div>
+              {/* 3. Cloudinary Picture Upload / Multi-Image URLs */}
+              <AdminMultiImageInput
+                urls={newImgUrls}
+                onChange={setNewImgUrls}
+                presets={IMAGE_PRESETS}
+                title="3. Product Pictures (Multiple Cloudinary URLs)"
+              />
 
               {/* 4. Pricing & Full Economics (Selling Price, Compare-At, Cost, Packing, Delivery) */}
               <div className="p-4 rounded-xl bg-[#FAF8F5] border border-gray-200/80 space-y-4">
@@ -1520,18 +1458,13 @@ export default function AdminProductsPage() {
                 </div>
               </div>
 
-              {/* Cloudinary URL */}
-              <div>
-                <label className="block text-xs font-bold uppercase tracking-wider text-gray-700 mb-1">
-                  Image URL (Cloudinary or Local)
-                </label>
-                <input
-                  type="text"
-                  value={editImgUrl}
-                  onChange={(e) => setEditImgUrl(e.target.value)}
-                  className="w-full px-3.5 py-2 text-xs sm:text-sm rounded-lg border border-gray-300"
-                />
-              </div>
+              {/* Product Pictures (Multiple Cloudinary URLs) */}
+              <AdminMultiImageInput
+                urls={editImgUrls}
+                onChange={setEditImgUrls}
+                presets={IMAGE_PRESETS}
+                title="Product Pictures (Multiple Cloudinary URLs)"
+              />
 
               {/* Pricing & Costs */}
               <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 p-3 rounded-lg bg-[#FAF8F5] border border-gray-200">
