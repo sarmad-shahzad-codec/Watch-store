@@ -23,10 +23,25 @@ function saveLocalFunds(items: StoreFund[]) {
 }
 
 /**
- * Fetch all store investment funds / capital from Supabase (or fallback to local cache).
+ * Fetch all store funds from API / Supabase.
  */
 export async function fetchFundsFromSupabase(): Promise<StoreFund[]> {
   try {
+    if (typeof window !== "undefined") {
+      try {
+        const res = await fetch("/api/admin/funds", { cache: "no-store" });
+        if (res.ok) {
+          const json = await res.json();
+          if (json.success && Array.isArray(json.funds)) {
+            saveLocalFunds(json.funds);
+            return json.funds;
+          }
+        }
+      } catch (apiErr) {
+        console.warn("API /api/admin/funds failed, falling back to direct client:", apiErr);
+      }
+    }
+
     const supabase = createClient();
     const { data, error } = await supabase
       .from("store_funds")
@@ -41,8 +56,8 @@ export async function fetchFundsFromSupabase(): Promise<StoreFund[]> {
     if (data) {
       const parsed: StoreFund[] = data.map((row: any) => ({
         id: Number(row.id),
-        title: row.title || "Capital Injection",
-        source: row.source || "Owner",
+        title: row.title || "Capital Fund",
+        source: row.source || "Owner Capital",
         amount: Number(row.amount) || 0,
         fund_date: row.fund_date || new Date().toISOString().split("T")[0],
         notes: row.notes || "",
@@ -61,19 +76,39 @@ export async function fetchFundsFromSupabase(): Promise<StoreFund[]> {
 }
 
 /**
- * Add a new investment/capital fund into Supabase and local cache.
+ * Add a new fund into Supabase and local cache.
  */
 export async function createFundInSupabase(
   fund: Omit<StoreFund, "id" | "created_at" | "updated_at">
 ): Promise<{ success: boolean; fund?: StoreFund; error?: string }> {
   try {
+    if (typeof window !== "undefined") {
+      try {
+        const res = await fetch("/api/admin/funds", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify(fund),
+        });
+        const json = await res.json();
+        if (res.ok && json.success && json.fund) {
+          const current = getLocalFunds();
+          saveLocalFunds([json.fund, ...current.filter((f) => f.id !== json.fund.id)]);
+          return { success: true, fund: json.fund };
+        } else if (!res.ok) {
+          return { success: false, error: json.error || "Failed to create fund" };
+        }
+      } catch (apiErr) {
+        console.warn("API create fund failed, falling back to client:", apiErr);
+      }
+    }
+
     const supabase = createClient();
     const { data, error } = await supabase
       .from("store_funds")
       .insert([
         {
           title: fund.title,
-          source: fund.source || "Owner Capital",
+          source: fund.source,
           amount: fund.amount,
           fund_date: fund.fund_date,
           notes: fund.notes || "",
@@ -124,6 +159,27 @@ export async function updateFundInSupabase(
   updates: Partial<Omit<StoreFund, "id">>
 ): Promise<{ success: boolean; error?: string }> {
   try {
+    if (typeof window !== "undefined") {
+      try {
+        const res = await fetch("/api/admin/funds", {
+          method: "PUT",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ id, ...updates }),
+        });
+        const json = await res.json();
+        if (res.ok && json.success) {
+          const current = getLocalFunds();
+          const updated = current.map((f) => (f.id === id ? { ...f, ...updates } : f));
+          saveLocalFunds(updated);
+          return { success: true };
+        } else if (!res.ok) {
+          return { success: false, error: json.error || "Failed to update fund" };
+        }
+      } catch (apiErr) {
+        console.warn("API update fund failed, falling back to client:", apiErr);
+      }
+    }
+
     const supabase = createClient();
     const { error } = await supabase
       .from("store_funds")
@@ -135,6 +191,7 @@ export async function updateFundInSupabase(
 
     if (error) {
       console.warn("Supabase update fund error:", error);
+      return { success: false, error: error.message };
     }
 
     const current = getLocalFunds();
@@ -148,17 +205,36 @@ export async function updateFundInSupabase(
 }
 
 /**
- * Delete a fund from Supabase.
+ * Permanently delete a fund from Supabase and local cache.
  */
 export async function deleteFundInSupabase(
   id: number
 ): Promise<{ success: boolean; error?: string }> {
   try {
+    let apiSuccess = false;
+
+    if (typeof window !== "undefined") {
+      try {
+        const res = await fetch(`/api/admin/funds?id=${encodeURIComponent(id)}`, {
+          method: "DELETE",
+        });
+        const json = await res.json();
+        if (res.ok && json.success) {
+          apiSuccess = true;
+        } else if (!res.ok) {
+          console.warn("API delete returned error:", json.error);
+        }
+      } catch (apiErr) {
+        console.warn("API delete fund call failed:", apiErr);
+      }
+    }
+
     const supabase = createClient();
     const { error } = await supabase.from("store_funds").delete().eq("id", id);
 
-    if (error) {
-      console.warn("Supabase delete fund error:", error);
+    if (error && !apiSuccess) {
+      console.error("Supabase direct delete fund error:", error);
+      return { success: false, error: error.message };
     }
 
     const current = getLocalFunds();

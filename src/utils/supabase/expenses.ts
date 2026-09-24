@@ -23,10 +23,26 @@ function saveLocalExpenses(items: StoreExpense[]) {
 }
 
 /**
- * Fetch all store expenses from Supabase (or fallback to local cache).
+ * Fetch all store expenses from API / Supabase.
  */
 export async function fetchExpensesFromSupabase(): Promise<StoreExpense[]> {
   try {
+    // If in browser, prefer server API endpoint with service role privileges
+    if (typeof window !== "undefined") {
+      try {
+        const res = await fetch("/api/admin/expenses", { cache: "no-store" });
+        if (res.ok) {
+          const json = await res.json();
+          if (json.success && Array.isArray(json.expenses)) {
+            saveLocalExpenses(json.expenses);
+            return json.expenses;
+          }
+        }
+      } catch (apiErr) {
+        console.warn("API /api/admin/expenses failed, falling back to direct client:", apiErr);
+      }
+    }
+
     const supabase = createClient();
     const { data, error } = await supabase
       .from("store_expenses")
@@ -67,6 +83,26 @@ export async function createExpenseInSupabase(
   expense: Omit<StoreExpense, "id" | "created_at" | "updated_at">
 ): Promise<{ success: boolean; expense?: StoreExpense; error?: string }> {
   try {
+    if (typeof window !== "undefined") {
+      try {
+        const res = await fetch("/api/admin/expenses", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify(expense),
+        });
+        const json = await res.json();
+        if (res.ok && json.success && json.expense) {
+          const current = getLocalExpenses();
+          saveLocalExpenses([json.expense, ...current.filter((e) => e.id !== json.expense.id)]);
+          return { success: true, expense: json.expense };
+        } else if (!res.ok) {
+          return { success: false, error: json.error || "Failed to create expense" };
+        }
+      } catch (apiErr) {
+        console.warn("API create expense failed, falling back to client:", apiErr);
+      }
+    }
+
     const supabase = createClient();
     const { data, error } = await supabase
       .from("store_expenses")
@@ -84,7 +120,6 @@ export async function createExpenseInSupabase(
 
     if (error || !data) {
       console.warn("Supabase insert failed, storing locally:", error);
-      // Fallback local creation
       const localId = Date.now();
       const newLocalExpense: StoreExpense = {
         id: localId,
@@ -125,6 +160,27 @@ export async function updateExpenseInSupabase(
   updates: Partial<Omit<StoreExpense, "id">>
 ): Promise<{ success: boolean; error?: string }> {
   try {
+    if (typeof window !== "undefined") {
+      try {
+        const res = await fetch("/api/admin/expenses", {
+          method: "PUT",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ id, ...updates }),
+        });
+        const json = await res.json();
+        if (res.ok && json.success) {
+          const current = getLocalExpenses();
+          const updated = current.map((e) => (e.id === id ? { ...e, ...updates } : e));
+          saveLocalExpenses(updated);
+          return { success: true };
+        } else if (!res.ok) {
+          return { success: false, error: json.error || "Failed to update expense" };
+        }
+      } catch (apiErr) {
+        console.warn("API update expense failed, falling back to client:", apiErr);
+      }
+    }
+
     const supabase = createClient();
     const { error } = await supabase
       .from("store_expenses")
@@ -136,9 +192,9 @@ export async function updateExpenseInSupabase(
 
     if (error) {
       console.warn("Supabase update error:", error);
+      return { success: false, error: error.message };
     }
 
-    // Always update local storage
     const current = getLocalExpenses();
     const updated = current.map((e) => (e.id === id ? { ...e, ...updates } : e));
     saveLocalExpenses(updated);
@@ -150,19 +206,40 @@ export async function updateExpenseInSupabase(
 }
 
 /**
- * Delete an expense from Supabase.
+ * Permanently delete an expense from Supabase and local cache.
  */
 export async function deleteExpenseInSupabase(
   id: number
 ): Promise<{ success: boolean; error?: string }> {
   try {
+    let apiSuccess = false;
+
+    if (typeof window !== "undefined") {
+      try {
+        const res = await fetch(`/api/admin/expenses?id=${encodeURIComponent(id)}`, {
+          method: "DELETE",
+        });
+        const json = await res.json();
+        if (res.ok && json.success) {
+          apiSuccess = true;
+        } else if (!res.ok) {
+          console.warn("API delete returned error:", json.error);
+        }
+      } catch (apiErr) {
+        console.warn("API delete expense call failed:", apiErr);
+      }
+    }
+
+    // Direct client fallback or dual verification
     const supabase = createClient();
     const { error } = await supabase.from("store_expenses").delete().eq("id", id);
 
-    if (error) {
-      console.warn("Supabase delete error:", error);
+    if (error && !apiSuccess) {
+      console.error("Supabase direct delete error:", error);
+      return { success: false, error: error.message };
     }
 
+    // Permanently remove from localStorage
     const current = getLocalExpenses();
     saveLocalExpenses(current.filter((e) => e.id !== id));
 

@@ -11,11 +11,11 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
     .replace(/-/g, " ")
     .replace(/\b\w/g, (char) => char.toUpperCase());
 
-  const isAccessory = ["accessories", "watch-boxes", "tool-kits", "straps"].includes(slug.toLowerCase());
+  const isComingSoon = ["women", "accessories", "watch-boxes", "tool-kits", "straps"].includes(slug.toLowerCase());
 
-  if (isAccessory) {
+  if (isComingSoon) {
     return {
-      title: `${brandName} (Coming Soon) | Gloria Times Pakistan`,
+      title: `${brandName} — Coming Soon | Gloria Times Pakistan`,
       description: `Discover upcoming luxury ${brandName} at Gloria Times. Launching soon with nationwide delivery across Pakistan.`,
     };
   }

@@ -14,7 +14,6 @@ import { PreviewSliderProvider } from "../context/PreviewSliderContext";
 import PreviewSliderModal from "@/components/Common/PreviewSlider";
 
 import ScrollToTop from "@/components/Common/ScrollToTop";
-import WhatsAppButton from "@/components/Common/WhatsAppButton";
 import { Toaster } from "react-hot-toast";
 import PreLoader from "@/components/Common/PreLoader";
 import WatchParallaxIntro from "@/components/Common/WatchParallaxIntro";
@@ -50,7 +49,6 @@ export default function RootLayout({
             </ReduxProvider>
             <ScrollToTop />
             <Toaster position="top-center" />
-            <WhatsAppButton />
             <ConditionalFooter />
       </body>
     </html>

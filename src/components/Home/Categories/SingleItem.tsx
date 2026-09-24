@@ -12,21 +12,22 @@ const SingleItem = ({ item }: { item: Category }) => {
   return (
     <Link
       href={`/shop-without-sidebar?category=${encodeURIComponent(item.title)}`}
-      className="group flex flex-col items-center select-none"
+      className="group flex flex-col items-center select-none py-2"
     >
-      {/* Circular Avatar Container — clean studio watch badges */}
-      <div className="relative w-36 h-36 sm:w-40 sm:h-40 rounded-full bg-[#F2F3F8] border border-gray-200/80 shadow-xs group-hover:shadow-md mb-3.5 overflow-hidden transition-all duration-300 group-hover:scale-105 group-hover:border-black/30 flex items-center justify-center">
+      {/* 100% Full Geometric Circle Container */}
+      <div className="relative w-36 h-36 sm:w-44 sm:h-44 md:w-48 md:h-48 aspect-square rounded-full bg-white border border-[#D9D4CC] shadow-sm group-hover:shadow-xl group-hover:border-[#1C1C1B] mb-3.5 overflow-hidden transition-all duration-300 group-hover:scale-105 flex items-center justify-center shrink-0">
         <Image
           src={item.img}
           alt={item.title}
           fill
           unoptimized={Boolean(isRemote)}
-          className="object-contain p-1.5 transition-transform duration-500 group-hover:scale-110"
+          sizes="(max-width: 640px) 144px, 192px"
+          className="object-cover scale-[1.08] transition-transform duration-500 group-hover:scale-[1.14]"
         />
       </div>
 
-      <div className="flex justify-center px-1">
-        <h3 className="inline-block font-semibold text-xs sm:text-sm text-center text-[#111] group-hover:text-black transition-colors relative pb-1 after:absolute after:bottom-0 after:left-1/2 after:-translate-x-1/2 after:h-0.5 after:w-0 group-hover:after:w-full after:bg-black after:transition-all after:duration-300 truncate max-w-[150px]">
+      <div className="flex justify-center px-1 text-center">
+        <h3 className="font-semibold text-sm sm:text-base text-[#1C1C1B] group-hover:text-[#8A7A5C] transition-colors truncate max-w-[160px]">
           {item.title}
         </h3>
       </div>

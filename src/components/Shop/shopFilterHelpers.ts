@@ -90,8 +90,12 @@ export function filterAndSortProducts(
       const targetCat = f.category.toLowerCase().trim();
       const pCat = (p.category || "").toLowerCase().trim();
       const pBrand = (p.brand || "").toLowerCase().trim();
-      const matchCat = pCat === targetCat || pCat.includes(targetCat) || targetCat.includes(pCat);
-      const matchBrand = pBrand === targetCat || pBrand.includes(targetCat) || targetCat.includes(pBrand);
+      const matchCat =
+        pCat.length > 0 &&
+        (pCat === targetCat || pCat.includes(targetCat) || targetCat.includes(pCat));
+      const matchBrand =
+        pBrand.length > 0 &&
+        (pBrand === targetCat || pBrand.includes(targetCat) || targetCat.includes(pBrand));
       if (!matchCat && !matchBrand) {
         return false;
       }

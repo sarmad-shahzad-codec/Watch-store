@@ -21,9 +21,20 @@ const ShopWithoutSidebarContent = () => {
   const searchParams = useSearchParams();
   const [productStyle, setProductStyle] = useState<"grid" | "list">("grid");
 
-  const [search, setSearch] = useState("");
-  const [brand, setBrand] = useState("all");
-  const [category, setCategory] = useState("all");
+  const [search, setSearch] = useState(() => searchParams.get("q") || searchParams.get("search") || "");
+  const [brand, setBrand] = useState(() => {
+    const brandParam = searchParams.get("brand");
+    if (brandParam) {
+      const matched = BRAND_OPTIONS.find(
+        (b) => b.value.toLowerCase() === brandParam.toLowerCase()
+      );
+      if (matched) return matched.value;
+    }
+    return "all";
+  });
+  const [category, setCategory] = useState(
+    () => searchParams.get("category") || searchParams.get("cat") || "all"
+  );
   const [price, setPrice] = useState<ShopPriceFilter>("all");
   const [sort, setSort] = useState<ShopSortKey>("latest");
 

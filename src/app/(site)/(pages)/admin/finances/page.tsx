@@ -179,40 +179,7 @@ export default function AdminFinancesPage() {
     setLoadingExpenses(true);
     try {
       const items = await fetchExpensesFromSupabase();
-      if (items && items.length > 0) {
-        setExpenses(items);
-      } else {
-        // Provide starter expenses if table is fresh
-        const starterExpenses = [
-          {
-            title: "Luxury Hardwood Presentation Boxes (50 pcs)",
-            category: "Packaging & Boxes",
-            amount: 7500,
-            expense_date: new Date().toISOString().split("T")[0],
-            notes: "Wooden presentation boxes with beige velvet cushions",
-          },
-          {
-            title: "Meta Ads (Instagram / Facebook) - PRX & Rolex Campaign",
-            category: "Marketing & Ads",
-            amount: 4500,
-            expense_date: new Date().toISOString().split("T")[0],
-            notes: "Targeted luxury watch buyers in Lahore, Karachi & Islamabad",
-          },
-          {
-            title: "Trax Logistics COD Packaging Flyers & Security Tape",
-            category: "Logistics & Returns",
-            amount: 1200,
-            expense_date: new Date().toISOString().split("T")[0],
-            notes: "Tamper-evident flyer bags & security seals",
-          },
-        ];
-
-        for (const item of starterExpenses) {
-          await createExpenseInSupabase(item);
-        }
-        const fresh = await fetchExpensesFromSupabase();
-        setExpenses(fresh);
-      }
+      setExpenses(items || []);
     } catch (err) {
       console.error("Failed to load expenses:", err);
     } finally {
@@ -225,21 +192,7 @@ export default function AdminFinancesPage() {
     setLoadingFunds(true);
     try {
       const items = await fetchFundsFromSupabase();
-      if (items && items.length > 0) {
-        setFunds(items);
-      } else {
-        // Provide starter opening capital fund
-        const initialFund = {
-          title: "Opening Store Working Capital",
-          source: "Owner Capital",
-          amount: 50000,
-          fund_date: new Date().toISOString().split("T")[0],
-          notes: "Initial working capital fund for inventory purchases, packaging & operations",
-        };
-        await createFundInSupabase(initialFund);
-        const fresh = await fetchFundsFromSupabase();
-        setFunds(fresh);
-      }
+      setFunds(items || []);
     } catch (err) {
       console.error("Failed to load funds:", err);
     } finally {

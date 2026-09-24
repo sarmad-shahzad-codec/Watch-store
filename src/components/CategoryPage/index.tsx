@@ -19,8 +19,25 @@ const BRAND_CONFIG: Record<
     tagline: string;
     description: string;
     isAccessory?: boolean;
+    isComingSoon?: boolean;
   }
 > = {
+  women: {
+    name: "Women's Collection",
+    brandKey: "women",
+    tagline: "Dainty Dials, Diamond Bezels & Timeless Elegance For Her",
+    description:
+      "We are curating an exclusive selection of luxury women's timepieces—from iconic rectangular silhouettes to diamond-set bezels and satin-brushed bracelets. Launching soon at Gloria Times.",
+    isComingSoon: true,
+  },
+  men: {
+    name: "Men's Collection",
+    brandKey: "men",
+    tagline: "Swiss Automatic, Divers & Classic Dress Timepieces For Him",
+    description:
+      "Discover our definitive lineup of luxury men's watches—featuring ceramic bezels, automatic movements, chronograph tachymeters, and robust stainless steel bracelets.",
+    isComingSoon: false,
+  },
   tissot: {
     name: "Tissot",
     brandKey: "Tissot",
@@ -136,9 +153,25 @@ export default function CategoryPageComponent({ slug }: CategoryPageProps) {
     ["accessories", "watch-boxes", "tool-kits", "straps"].includes(normalizedSlug)
   );
 
-  // Filter products for category (distinct accessories per slug)
+  const isComingSoon = Boolean(
+    brandInfo.isComingSoon ||
+    ["women", "accessories", "watch-boxes", "tool-kits", "straps"].includes(normalizedSlug)
+  );
+
+  // Filter products for category (distinct accessories or men/women per slug)
   const categoryProducts = useMemo(() => {
     const clean = (s: string) => s.toLowerCase().replace(/[^a-z0-9]/g, "");
+
+    if (normalizedSlug === "women") {
+      return [];
+    }
+
+    if (normalizedSlug === "men") {
+      return products.filter((p) => {
+        const cleanBrand = clean(p.brand || "");
+        return !cleanBrand.includes("accessories");
+      });
+    }
 
     if (normalizedSlug === "accessories") {
       return products.filter((p) => clean(p.brand).includes("accessories"));
@@ -208,7 +241,7 @@ export default function CategoryPageComponent({ slug }: CategoryPageProps) {
                 <span className="inline-block px-3 py-1 rounded-full bg-black text-white text-[11px] font-bold uppercase tracking-wider">
                   {brandInfo.name} {isAccessory ? "Collection" : "Official Category"}
                 </span>
-                {isAccessory && (
+                {isComingSoon && (
                   <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-amber-500/15 border border-amber-500/40 text-amber-900 text-[11px] font-extrabold uppercase tracking-widest animate-pulse">
                     <span className="w-1.5 h-1.5 rounded-full bg-amber-600" />
                     COMING SOON
@@ -216,7 +249,7 @@ export default function CategoryPageComponent({ slug }: CategoryPageProps) {
                 )}
               </div>
               <h1 className="text-3xl sm:text-4xl md:text-5xl font-extrabold text-[#111] tracking-tight leading-tight">
-                {brandInfo.name} {isAccessory ? "" : "Watches"}
+                {brandInfo.name} {isAccessory || normalizedSlug === "women" || normalizedSlug === "men" ? "" : "Watches"}
               </h1>
               <p className="text-base sm:text-lg font-medium text-gray-700 mt-2">
                 {brandInfo.tagline}
@@ -225,16 +258,22 @@ export default function CategoryPageComponent({ slug }: CategoryPageProps) {
                 {brandInfo.description}
               </p>
 
-              {/* Coming Soon Staging Banner for Accessories */}
-              {isAccessory && (
+              {/* Coming Soon Staging Banner for Women & Accessories */}
+              {isComingSoon && (
                 <div className="mt-5 p-4 sm:p-5 rounded-2xl bg-[#0B0F19] border border-[#F2C27B]/30 text-white shadow-xl flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
                   <div>
                     <div className="flex items-center gap-2 text-[#F2C27B] font-bold text-xs sm:text-sm uppercase tracking-wider">
                       <span>⏳</span>
-                      <span>COMING SOON — OFFICIAL ACCESSORY DROP</span>
+                      <span>
+                        {normalizedSlug === "women"
+                          ? "COMING SOON — WOMEN'S LUXURY COLLECTION"
+                          : "COMING SOON — OFFICIAL ACCESSORY DROP"}
+                      </span>
                     </div>
                     <p className="text-xs sm:text-sm text-gray-300 mt-1 leading-relaxed">
-                      Our master-crafted accessory line is currently in final staging. Pre-order inquiries and stock reservations are open via WhatsApp.
+                      {normalizedSlug === "women"
+                        ? "Our master-crafted women's timepiece catalog is currently in final staging. Pre-order inquiries and stock reservations are open via WhatsApp."
+                        : "Our master-crafted accessory line is currently in final staging. Pre-order inquiries and stock reservations are open via WhatsApp."}
                     </p>
                   </div>
                   <a
@@ -310,35 +349,115 @@ export default function CategoryPageComponent({ slug }: CategoryPageProps) {
                 ))}
               </div>
             ) : (
-              <div className="text-center py-16 px-6 rounded-2xl bg-[#FAF8F5] border-2 border-dashed border-[#F2C27B]/40 max-w-lg mx-auto">
-                <div className="w-14 h-14 mx-auto mb-3 rounded-full bg-[#0B0F19] text-[#F2C27B] flex items-center justify-center text-2xl">
-                  ⏳
-                </div>
-                <span className="inline-block px-3 py-1 rounded-full bg-amber-100 text-amber-900 font-bold text-xs uppercase tracking-widest mb-2">
-                  COMING SOON
-                </span>
-                <p className="text-base font-bold text-gray-900 mb-1">
-                  {brandInfo.name} Launching Soon
-                </p>
-                <p className="text-xs sm:text-sm text-gray-600 mb-5">
-                  Stock arrives shortly. Contact our concierge on WhatsApp to pre-order or get notified first.
-                </p>
-                <div className="flex items-center justify-center gap-3">
-                  <a
-                    href="https://wa.me/923257982233?text=Assalam%20o%20Alaikum%20Gloria%20Times%2C%20I%20want%20to%20reserve%20accessories"
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="inline-flex items-center gap-2 px-5 py-2.5 rounded-lg bg-[#25D366] text-black text-xs font-bold uppercase tracking-wider hover:bg-[#20bd5a] transition-colors shadow-sm"
+              <div className="py-6">
+                <div className="text-center py-16 px-6 rounded-2xl bg-[#FAF8F5] border-2 border-dashed border-[#F2C27B]/40 max-w-xl mx-auto shadow-sm">
+                  <div className="w-16 h-16 mx-auto mb-4 rounded-full bg-[#1C1C1B] text-[#F2C27B] flex items-center justify-center text-3xl shadow-md">
+                    ⏳
+                  </div>
+                  <span className="inline-block px-3.5 py-1 rounded-full bg-amber-500/15 border border-amber-500/30 text-amber-900 font-bold text-xs uppercase tracking-widest mb-3">
+                    COMING SOON
+                  </span>
+                  <h3
+                    className="text-2xl sm:text-3xl font-bold text-[#1C1C1B] mb-2"
+                    style={{ fontFamily: "'Cormorant Garamond', Georgia, serif" }}
                   >
-                    <span>Reserve on WhatsApp</span>
-                  </a>
-                  <Link
-                    href="/shop-without-sidebar"
-                    className="inline-flex items-center gap-1.5 px-5 py-2.5 rounded-lg bg-black text-white text-xs font-bold uppercase tracking-wider hover:bg-gray-800 transition-colors"
-                  >
-                    <span>View Watches</span>
-                  </Link>
+                    {normalizedSlug === "women"
+                      ? "Women's Luxury Timepieces — Launching Soon"
+                      : `${brandInfo.name} Launching Soon`}
+                  </h3>
+                  <p className="text-sm text-gray-600 mb-6 max-w-md mx-auto leading-relaxed">
+                    {normalizedSlug === "women"
+                      ? "Our curated collection of dainty dials, diamond-bezel pieces, and Parisian classics for her is in final staging. Pre-order inquiries and stock reservations are open now."
+                      : "Stock arrives shortly. Contact our concierge on WhatsApp to pre-order or get notified first."}
+                  </p>
+                  <div className="flex flex-wrap items-center justify-center gap-3">
+                    <a
+                      href={`https://wa.me/923257982233?text=${encodeURIComponent(
+                        `Assalam o Alaikum Gloria Times, I want to inquire/reserve an item from ${brandInfo.name} (Coming Soon)`
+                      )}`}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="inline-flex items-center gap-2 px-6 py-3 rounded-lg bg-[#25D366] text-black text-xs font-bold uppercase tracking-wider hover:bg-[#20bd5a] transition-colors shadow-sm"
+                    >
+                      <span>Reserve on WhatsApp</span>
+                    </a>
+                    {normalizedSlug === "women" ? (
+                      <Link
+                        href="/category/men"
+                        className="inline-flex items-center gap-1.5 px-6 py-3 rounded-lg bg-[#1C1C1B] text-[#EEEBE6] text-xs font-bold uppercase tracking-wider hover:bg-black transition-colors"
+                      >
+                        <span>Explore Men&apos;s Watches</span>
+                      </Link>
+                    ) : (
+                      <Link
+                        href="/shop-without-sidebar"
+                        className="inline-flex items-center gap-1.5 px-6 py-3 rounded-lg bg-[#1C1C1B] text-[#EEEBE6] text-xs font-bold uppercase tracking-wider hover:bg-black transition-colors"
+                      >
+                        <span>View All Watches</span>
+                      </Link>
+                    )}
+                  </div>
                 </div>
+
+                {/* Sneak peek preview for women */}
+                {normalizedSlug === "women" && (
+                  <div className="mt-14 max-w-4xl mx-auto">
+                    <div className="text-center mb-8">
+                      <span className="text-xs uppercase tracking-[0.2em] font-semibold text-[#8A7A5C]">
+                        First Look Teaser
+                      </span>
+                      <h4
+                        className="text-xl sm:text-2xl font-semibold text-[#1C1C1B] mt-1"
+                        style={{ fontFamily: "'Cormorant Garamond', Georgia, serif" }}
+                      >
+                        Upcoming Timepieces in Final Staging
+                      </h4>
+                    </div>
+
+                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
+                      {[
+                        {
+                          title: "Cartier Santos Demoiselle",
+                          sub: "Parisian Roman Numerals · Sapphire Crown",
+                          img: "/images/2s/cartier-tank-1.jpg",
+                        },
+                        {
+                          title: "Cartier Tank Française Gold Accents",
+                          sub: "Curved Ergonomic Case · 2-Tone Steel",
+                          img: "/images/2s/cartier-tank-2.jpg",
+                        },
+                      ].map((item, idx) => (
+                        <div
+                          key={idx}
+                          className="group relative overflow-hidden rounded-xl border border-[#D9D4CC] bg-[#FAF8F5] p-5 flex items-center gap-5 shadow-xs hover:shadow-md transition"
+                        >
+                          <div className="relative w-28 h-28 bg-white rounded-lg overflow-hidden shrink-0 border border-gray-100 flex items-center justify-center">
+                            {/* eslint-disable-next-line @next/next/no-img-element */}
+                            <img
+                              src={item.img}
+                              alt={item.title}
+                              className="w-full h-full object-contain p-2 group-hover:scale-105 transition-transform duration-300"
+                            />
+                            <span className="absolute top-1 right-1 px-1.5 py-0.5 rounded bg-amber-500 text-white font-extrabold text-[9px] uppercase tracking-wider">
+                              Soon
+                            </span>
+                          </div>
+                          <div>
+                            <span className="text-[10px] font-bold text-amber-800 uppercase tracking-widest bg-amber-100 px-2 py-0.5 rounded">
+                              Coming Soon
+                            </span>
+                            <h5 className="font-semibold text-base text-[#1C1C1B] mt-1.5">
+                              {item.title}
+                            </h5>
+                            <p className="text-xs text-gray-500 mt-0.5">
+                              {item.sub}
+                            </p>
+                          </div>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                )}
               </div>
             )}
 

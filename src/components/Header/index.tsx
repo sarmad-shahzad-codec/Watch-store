@@ -4,42 +4,42 @@ import React, { useState, useRef, useEffect, useMemo } from "react";
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
 import Image from "next/image";
-import { Search, ShoppingBag, Heart, ChevronDown, X, Menu } from "lucide-react";
+import {
+  Search,
+  ShoppingBag,
+  Heart,
+  ChevronDown,
+  X,
+  Menu,
+  ArrowRight,
+} from "lucide-react";
 import { useAppSelector } from "@/redux/store";
-import { useSelector } from "react-redux";
-import { selectTotalPrice } from "@/redux/features/cart-slice";
 import { useCartModalContext } from "@/app/context/CartSidebarModalContext";
-import { formatPkr } from "@/lib/formatCurrency";
-import shopData from "@/components/Shop/shopData";
 import { useStoreProducts } from "@/hooks/useProducts";
+import GloriaLogo from "@/components/Common/GloriaLogo";
 
 const Header = () => {
   const pathname = usePathname();
   const router = useRouter();
   const { openCartModal } = useCartModalContext();
   const { products } = useStoreProducts();
+
   const [searchQuery, setSearchQuery] = useState("");
-  const [isCategoryOpen, setIsCategoryOpen] = useState(false);
-  const [isAccessoriesOpen, setIsAccessoriesOpen] = useState(false);
   const [isSearchOpen, setIsSearchOpen] = useState(false);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
+  const [isAccessoriesOpen, setIsAccessoriesOpen] = useState(false);
 
   const searchInputRef = useRef<HTMLInputElement>(null);
   const searchContainerRef = useRef<HTMLDivElement>(null);
 
-  const product = useAppSelector((state) => state.cartReducer.items);
-  const wishlistItems = useAppSelector((state) => state.wishlistReducer?.items || []);
-  const totalPrice = useSelector(selectTotalPrice);
-
-  const formattedTotal =
-    totalPrice > 0 ? formatPkr(totalPrice) : formatPkr(0);
-
-  const isAccessoryRoute = Boolean(
-    pathname?.startsWith("/category/accessories") ||
-    pathname?.startsWith("/category/watch-boxes") ||
-    pathname?.startsWith("/category/tool-kits") ||
-    pathname?.startsWith("/category/straps")
+  const cartItems = useAppSelector((state) => state.cartReducer.items);
+  const wishlistItems = useAppSelector(
+    (state) => state.wishlistReducer?.items || []
   );
+
+  const totalCartCount = useMemo(() => {
+    return cartItems.reduce((acc, item) => acc + (item.quantity || 1), 0);
+  }, [cartItems]);
 
   // Focus input when search opens
   useEffect(() => {
@@ -50,7 +50,7 @@ const Header = () => {
     }
   }, [isSearchOpen]);
 
-  // Close search & mobile menu on Escape key or click outside
+  // Handle escape & outside clicks
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
       if (e.key === "Escape") {
@@ -79,7 +79,7 @@ const Header = () => {
     };
   }, [isSearchOpen]);
 
-  // Close mobile menu on route change
+  // Close menus on route change
   useEffect(() => {
     setIsMobileMenuOpen(false);
     setIsSearchOpen(false);
@@ -105,12 +105,6 @@ const Header = () => {
     router.push(`/shop-details/${productId}`);
   };
 
-  const handleSelectCategory = (categoryName: string) => {
-    setIsSearchOpen(false);
-    setSearchQuery("");
-    router.push(`/shop-without-sidebar?category=${encodeURIComponent(categoryName)}`);
-  };
-
   // Filter products for live prediction
   const filteredProducts = searchQuery.trim()
     ? products
@@ -118,604 +112,343 @@ const Header = () => {
           (item) =>
             item.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
             item.brand.toLowerCase().includes(searchQuery.toLowerCase()) ||
-            (item.category && item.category.toLowerCase().includes(searchQuery.toLowerCase()))
+            (item.category &&
+              item.category.toLowerCase().includes(searchQuery.toLowerCase()))
         )
         .slice(0, 4)
     : [];
 
-  // Distinct categories extracted dynamically from products
-  const availableCategories = useMemo(() => {
-    const set = new Set<string>();
-    products.forEach((p) => {
-      if (p.category && p.category.trim()) {
-        set.add(p.category.trim());
-      }
-    });
-    if (set.size === 0) {
-      return [
-        "Men's Automatic Watches",
-        "Chronograph Sport",
-        "Diamond Bezel Luxury",
-        "Diver Luxury Watches",
-        "Classic Dress Watches",
-        "Prestige Haute Horlogerie",
-      ];
-    }
-    return Array.from(set);
-  }, [products]);
-
-  const accessoryLinks = [
-    { name: "All Accessories", href: "/category/accessories", slug: "accessories" },
-    { name: "Luxury Watch Presentation Boxes", href: "/category/watch-boxes", slug: "watch-boxes" },
-    { name: "Link Adjuster Tool Kit", href: "/category/tool-kits", slug: "tool-kits" },
-    { name: "Silicone & Leather Straps", href: "/category/straps", slug: "straps" },
+  const navLinks = [
+    { name: "Men", href: "/category/men" },
+    { name: "Women", href: "/category/women" },
+    { name: "Collections", href: "/shop-without-sidebar" },
+    { name: "New In", href: "/shop-without-sidebar?sort=newest" },
+    { name: "Accessories", href: "/category/accessories" },
   ];
 
   return (
-    <div className="fixed left-0 top-0 z-9999 w-full shadow-md" ref={searchContainerRef}>
-      {/* Continuous Moving Luxury Announcement Top Bar */}
-      <div
-        role="region"
-        aria-label="Store announcement"
-        className="relative overflow-hidden bg-[#0A0D14] border-b border-white/10 py-2 sm:py-2.5 select-none"
-      >
-        {/* Subtle Edge Vignettes */}
-        <div className="pointer-events-none absolute inset-y-0 left-0 w-8 sm:w-16 bg-gradient-to-r from-[#0A0D14] to-transparent z-10" />
-        <div className="pointer-events-none absolute inset-y-0 right-0 w-8 sm:w-16 bg-gradient-to-l from-[#0A0D14] to-transparent z-10" />
-
-        <div className="animate-announcement-scroll flex items-center gap-6 sm:gap-10 whitespace-nowrap text-[11px] sm:text-xs tracking-wide">
-          {[
-            {
-              icon: "🎁",
-              highlight: "SPECIAL OFFER:",
-              text: "Buy Any 2 Watches & Get A Free Watch Adjuster Tool",
-            },
-            {
-              icon: "⚡",
-              highlight: "EXPRESS DELIVERY:",
-              text: "Nationwide Doorstep Delivery in 2 - 4 Days",
-            },
-            {
-              icon: "🛡️",
-              highlight: "GUARANTEE:",
-              text: "Strict 24-Hour Replacement Warranty (No Returns)",
-            },
-            {
-              icon: "💎",
-              highlight: "MASTER QUALITY:",
-              text: "1:1 Precision Finish · Hard-Shell Luxury Box Included",
-            },
-            {
-              icon: "💵",
-              highlight: "CASH ON DELIVERY:",
-              text: "Available Across Pakistan (Rs. 250 Advance Delivery)",
-            },
-            {
-              icon: "🎁",
-              highlight: "SPECIAL OFFER:",
-              text: "Buy Any 2 Watches & Get A Free Watch Adjuster Tool",
-            },
-            {
-              icon: "⚡",
-              highlight: "EXPRESS DELIVERY:",
-              text: "Nationwide Doorstep Delivery in 2 - 4 Days",
-            },
-            {
-              icon: "🛡️",
-              highlight: "GUARANTEE:",
-              text: "Strict 24-Hour Replacement Warranty (No Returns)",
-            },
-            {
-              icon: "💎",
-              highlight: "MASTER QUALITY:",
-              text: "1:1 Precision Finish · Hard-Shell Luxury Box Included",
-            },
-            {
-              icon: "💵",
-              highlight: "CASH ON DELIVERY:",
-              text: "Available Across Pakistan (Rs. 250 Advance Delivery)",
-            },
-          ].map((item, idx) => (
-            <div key={idx} className="flex items-center gap-2 text-gray-200">
-              <span className="text-sm shrink-0">{item.icon}</span>
-              <span className="text-[#F2C27B] font-bold text-[10px] sm:text-[11px] tracking-wider uppercase shrink-0">
-                {item.highlight}
-              </span>
-              <span className="text-gray-300 font-medium shrink-0">
-                {item.text}
-              </span>
-              <span className="text-[#F2C27B]/40 ml-4 sm:ml-8 shrink-0">✦</span>
-            </div>
-          ))}
+    <div
+      className="fixed left-0 top-0 z-9999 w-full select-none"
+      ref={searchContainerRef}
+    >
+      {/* 1. Top Announcement Bar matching artifact style */}
+      <div className="h-8 sm:h-9 bg-[#1C1C1B] text-[#E9E5DE] flex items-center justify-center px-4 text-[12px] sm:text-[13px] font-normal tracking-wide transition-colors">
+        <div className="flex items-center gap-2">
+          <span>New arrivals are here</span>
+          <span className="text-[#C5A880]">·</span>
+          <Link
+            href="/shop-without-sidebar"
+            className="text-[#E9E5DE] hover:text-[#C5A880] font-semibold underline underline-offset-4 decoration-[#C5A880]/50 transition-colors"
+          >
+            Shop now
+          </Link>
         </div>
       </div>
 
-      {/* Main Single-Row Luxury Black Header Bar matching media_1788942625712.png */}
-      <header className="w-full bg-[#050505] text-white border-b border-white/10 backdrop-blur-xl transition-all duration-300 relative shadow-2xl">
-        <div className="max-w-[1360px] mx-auto px-4 sm:px-6 lg:px-8">
-          {!isSearchOpen ? (
-            <div className="flex items-center justify-between h-16 sm:h-[68px] gap-4">
-              {/* Left: Brand Logo & Title */}
-              <Link
-                href="/"
-                className="flex items-center gap-2.5 sm:gap-3 group shrink-0"
-              >
-                <div className="relative h-9 w-9 sm:h-10 sm:w-10 rounded-full bg-white/10 p-0.5 flex items-center justify-center border border-white/20">
-                  <Image
-                    src="/images/logo.png"
-                    alt="Gloria Times"
-                    width={38}
-                    height={38}
-                    className="h-8 w-8 sm:h-9 sm:w-9 object-contain"
-                    priority
-                  />
-                </div>
-                <div className="flex flex-col items-start text-left">
-                  <span className="text-[9px] font-semibold uppercase tracking-[0.32em] text-[#C5A880] leading-none mb-0.5">
-                    The Watch
-                  </span>
-                  <span className="text-base sm:text-lg font-bold tracking-[0.2em] uppercase text-white group-hover:text-[#F2C27B] transition-colors duration-200">
-                    Gloria Times
-                  </span>
-                </div>
-              </Link>
-
-              {/* Center: Desktop Navigation Links */}
-              <nav
-                className="hidden lg:flex items-center gap-7 xl:gap-9 text-[12px] xl:text-[13px] tracking-[0.14em] uppercase font-medium"
-                aria-label="Primary"
-              >
-                {/* 1. Home */}
-                <Link
-                  href="/"
-                  className={`relative py-1.5 transition-colors duration-200 group ${
-                    pathname === "/" ? "text-[#F2C27B] font-bold" : "text-gray-300 hover:text-white"
-                  }`}
-                >
-                  <span>Home</span>
-                  <span
-                    className={`absolute bottom-0 left-0 h-[2px] bg-[#F2C27B] rounded-full transition-all duration-200 ${
-                      pathname === "/" ? "w-full" : "w-0 group-hover:w-full"
-                    }`}
-                  />
-                </Link>
-
-                {/* 2. All Products */}
-                <Link
-                  href="/shop-without-sidebar"
-                  className={`relative py-1.5 transition-colors duration-200 group ${
-                    pathname === "/shop-without-sidebar"
-                      ? "text-[#F2C27B] font-bold"
-                      : "text-gray-300 hover:text-white"
-                  }`}
-                >
-                  <span>All Products</span>
-                  <span
-                    className={`absolute bottom-0 left-0 h-[2px] bg-[#F2C27B] rounded-full transition-all duration-200 ${
-                      pathname === "/shop-without-sidebar"
-                        ? "w-full"
-                        : "w-0 group-hover:w-full"
-                    }`}
-                  />
-                </Link>
-
-                {/* 3. Accessories Dropdown */}
-                <div
-                  className="relative group"
-                  onMouseEnter={() => setIsAccessoriesOpen(true)}
-                  onMouseLeave={() => setIsAccessoriesOpen(false)}
-                >
-                  <div
-                    className={`relative py-1.5 flex items-center gap-1 cursor-pointer transition-colors duration-200 ${
-                      isAccessoryRoute
-                        ? "text-[#F2C27B] font-bold"
-                        : "text-gray-300 hover:text-white"
-                    }`}
-                    onClick={() => setIsAccessoriesOpen(!isAccessoriesOpen)}
-                  >
-                    <Link href="/category/accessories" className="uppercase">
-                      Accessories
-                    </Link>
-                    <ChevronDown
-                      className={`h-3.5 w-3.5 transition-transform duration-200 ${
-                        isAccessoriesOpen ? "rotate-180" : ""
-                      }`}
-                    />
-                    <span
-                      className={`absolute bottom-0 left-0 h-[2px] bg-[#F2C27B] rounded-full transition-all duration-200 ${
-                        isAccessoryRoute
-                          ? "w-full"
-                          : "w-0 group-hover:w-full"
-                      }`}
-                    />
-                  </div>
-
-                  {/* Dropdown Card */}
-                  <div
-                    className={`absolute left-1/2 -translate-x-1/2 top-full pt-2 z-50 w-max min-w-[280px] transition-all duration-200 ${
-                      isAccessoriesOpen
-                        ? "opacity-100 visible translate-y-0"
-                        : "opacity-0 invisible -translate-y-1 pointer-events-none"
-                    }`}
-                  >
-                    <div className="bg-[#0D111A] rounded-xl shadow-2xl border border-white/15 py-2.5 backdrop-blur-xl">
-                      {accessoryLinks.map((acc) => {
-                        const isActive = pathname === acc.href;
-                        return (
-                          <Link
-                            key={acc.name}
-                            href={acc.href}
-                            className={`block px-5 py-2.5 text-xs tracking-wider uppercase whitespace-nowrap transition-colors font-medium ${
-                              isActive
-                                ? "bg-white/15 text-[#F2C27B] font-bold"
-                                : "text-gray-300 hover:bg-white/10 hover:text-white"
-                            }`}
-                            onClick={() => setIsAccessoriesOpen(false)}
-                          >
-                            {acc.name}
-                          </Link>
-                        );
-                      })}
-                    </div>
-                  </div>
-                </div>
-
-                {/* 4. Categories Dropdown */}
-                <div
-                  className="relative group"
-                  onMouseEnter={() => setIsCategoryOpen(true)}
-                  onMouseLeave={() => setIsCategoryOpen(false)}
-                >
-                  <div
-                    className={`relative py-1.5 flex items-center gap-1 cursor-pointer transition-colors duration-200 ${
-                      isCategoryOpen
-                        ? "text-[#F2C27B] font-bold"
-                        : "text-gray-300 hover:text-white"
-                    }`}
-                    onClick={() => setIsCategoryOpen(!isCategoryOpen)}
-                  >
-                    <Link href="/shop-without-sidebar" className="uppercase">
-                      Categories
-                    </Link>
-                    <ChevronDown
-                      className={`h-3.5 w-3.5 transition-transform duration-200 ${
-                        isCategoryOpen ? "rotate-180" : ""
-                      }`}
-                    />
-                    <span
-                      className={`absolute bottom-0 left-0 h-[2px] bg-[#F2C27B] rounded-full transition-all duration-200 ${
-                        isCategoryOpen
-                          ? "w-full"
-                          : "w-0 group-hover:w-full"
-                      }`}
-                    />
-                  </div>
-
-                  {/* Categories Dropdown Card */}
-                  <div
-                    className={`absolute left-1/2 -translate-x-1/2 top-full pt-2 z-50 w-max min-w-[240px] max-w-[320px] transition-all duration-200 ${
-                      isCategoryOpen
-                        ? "opacity-100 visible translate-y-0"
-                        : "opacity-0 invisible -translate-y-1 pointer-events-none"
-                    }`}
-                  >
-                    <div className="bg-[#0D111A] rounded-xl shadow-2xl border border-white/15 py-2.5 backdrop-blur-xl">
-                      {availableCategories.map((cat) => (
-                        <Link
-                          key={cat}
-                          href={`/shop-without-sidebar?category=${encodeURIComponent(cat)}`}
-                          className="block px-4 py-2.5 text-xs tracking-wider uppercase text-gray-300 hover:bg-white/10 hover:text-[#F2C27B] transition-colors font-medium truncate"
-                          onClick={() => setIsCategoryOpen(false)}
-                        >
-                          {cat}
-                        </Link>
-                      ))}
-                    </div>
-                  </div>
-                </div>
-
-                {/* 5. Contact Us */}
-                <Link
-                  href="/contact"
-                  className={`relative py-1.5 transition-colors duration-200 group ${
-                    pathname === "/contact"
-                      ? "text-[#F2C27B] font-bold"
-                      : "text-gray-300 hover:text-white"
-                  }`}
-                >
-                  <span>Contact Us</span>
-                  <span
-                    className={`absolute bottom-0 left-0 h-[2px] bg-[#F2C27B] rounded-full transition-all duration-200 ${
-                      pathname === "/contact"
-                        ? "w-full"
-                        : "w-0 group-hover:w-full"
-                    }`}
-                  />
-                </Link>
-              </nav>
-
-              {/* Right: Actions (Search, Wishlist, Cart) - Icons Only, Text on Hover (matching media_1788943701982.png) */}
-              {/* Right: Actions (Search, Wishlist, Cart) - Icons Only, Pure CSS Tooltips */}
-              <div className="flex items-center gap-1.5 sm:gap-2.5 shrink-0">
-                {/* Search Button with Pure CSS Tooltip */}
-                <div className="relative group/search flex items-center">
-                  <button
-                    type="button"
-                    onClick={() => setIsSearchOpen(true)}
-                    className="flex items-center justify-center w-9 h-9 sm:w-10 sm:h-10 rounded-full text-gray-300 hover:text-white hover:bg-white/10 transition-colors"
-                    aria-label="Search watches"
-                  >
-                    <Search className="h-5 w-5" strokeWidth={1.8} />
-                  </button>
-                  <div className="absolute right-0 top-full mt-1.5 z-50 pointer-events-none opacity-0 invisible -translate-y-1 group-hover/search:opacity-100 group-hover/search:visible group-hover/search:translate-y-0 transition-all duration-150 whitespace-nowrap">
-                    <div className="bg-[#0D111A]/95 border border-white/20 text-[#F2C27B] text-[11px] font-medium tracking-wide py-1 px-2.5 rounded shadow-xl backdrop-blur-md">
-                      Search watches
-                    </div>
-                  </div>
-                </div>
-
-                {/* Wishlist Button with Badge & Pure CSS Tooltip */}
-                <div className="relative group/wishlist flex items-center">
+      {/* 2. Main Luxury Header matching artifact */}
+      <header className="h-[60px] lg:h-[76px] w-full bg-[#EEEBE6]/95 backdrop-blur-md border-b border-[#D9D4CC] px-2 sm:px-6 lg:px-10 transition-colors shadow-sm">
+        <div className="h-full w-full max-w-[1440px] mx-auto grid grid-cols-3 items-center">
+          {/* Left Column */}
+          <div className="flex items-center">
+            {/* Desktop Navigation */}
+            <nav
+              aria-label="Main"
+              className="hidden lg:flex items-center gap-7 xl:gap-8 text-[14px] font-medium text-[#1C1C1B]"
+              style={{ fontFamily: "'Instrument Sans', sans-serif" }}
+            >
+              {navLinks.map((link) => {
+                const isActive = pathname === link.href;
+                return (
                   <Link
-                    href="/wishlist"
-                    aria-label={`Wishlist, ${wishlistItems.length} items`}
-                    className="relative flex items-center justify-center w-9 h-9 sm:w-10 sm:h-10 rounded-full text-gray-300 hover:text-white hover:bg-white/10 transition-colors"
+                    key={link.name}
+                    href={link.href}
+                    className={`py-3 transition-colors relative group ${
+                      isActive
+                        ? "text-[#1C1C1B] font-semibold"
+                        : "text-[#1C1C1B] hover:text-[#6F6556]"
+                    }`}
                   >
-                    <Heart className="h-5 w-5" strokeWidth={1.8} />
-                    {wishlistItems.length > 0 && (
-                      <span className="absolute top-1 right-1 flex h-4 min-w-[16px] items-center justify-center rounded-full bg-[#E53E3E] px-1 text-[9px] font-bold text-white shadow-sm">
-                        {wishlistItems.length}
-                      </span>
-                    )}
+                    <span>{link.name}</span>
+                    <span
+                      className={`absolute bottom-1.5 left-0 h-[1.5px] bg-[#1C1C1B] rounded-full transition-all duration-200 ${
+                        isActive ? "w-full" : "w-0 group-hover:w-full"
+                      }`}
+                    />
                   </Link>
-                  <div className="absolute right-0 top-full mt-1.5 z-50 pointer-events-none opacity-0 invisible -translate-y-1 group-hover/wishlist:opacity-100 group-hover/wishlist:visible group-hover/wishlist:translate-y-0 transition-all duration-150 whitespace-nowrap">
-                    <div className="bg-[#0D111A]/95 border border-white/20 text-white text-[11px] font-medium tracking-wide py-1 px-2.5 rounded shadow-xl backdrop-blur-md">
-                      Wishlist {wishlistItems.length > 0 ? `(${wishlistItems.length})` : ""}
-                    </div>
-                  </div>
-                </div>
+                );
+              })}
+            </nav>
 
-                {/* Shopping Bag Button with Badge & Pure CSS Tooltip */}
-                <div className="relative group/cart flex items-center">
-                  <button
-                    type="button"
-                    onClick={() => openCartModal()}
-                    className="relative flex items-center justify-center w-9 h-9 sm:w-10 sm:h-10 rounded-full text-gray-300 hover:text-white hover:bg-white/10 transition-colors"
-                    aria-label={`Shopping cart, ${product.length} items`}
-                  >
-                    <ShoppingBag className="h-5 w-5" strokeWidth={1.8} />
-                    {product.length > 0 && (
-                      <span className="absolute top-1 right-1 flex h-4 min-w-[16px] items-center justify-center rounded-full bg-[#E53E3E] px-1 text-[9px] font-bold text-white shadow-sm">
-                        {product.length}
-                      </span>
-                    )}
-                  </button>
-                  <div className="absolute right-0 top-full mt-1.5 z-50 pointer-events-none opacity-0 invisible -translate-y-1 group-hover/cart:opacity-100 group-hover/cart:visible group-hover/cart:translate-y-0 transition-all duration-150 whitespace-nowrap">
-                    <div className="bg-[#0D111A]/95 border border-white/20 text-white text-[11px] font-medium tracking-wide py-1 px-2.5 rounded shadow-xl backdrop-blur-md">
-                      Cart {product.length > 0 ? `(${product.length}) • ${formattedTotal}` : "(Empty)"}
-                    </div>
-                  </div>
-                </div>
-
-                {/* Mobile Menu Toggle Button */}
-                <button
-                  type="button"
-                  onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
-                  className="lg:hidden flex items-center justify-center w-9 h-9 sm:w-10 sm:h-10 rounded-full text-gray-300 hover:text-white hover:bg-white/10 transition-colors ml-0.5"
-                  aria-label="Toggle navigation menu"
-                >
-                  <Menu className="h-5 w-5" strokeWidth={1.8} />
-                </button>
-              </div>
-            </div>
-          ) : (
-            /* When Search is Opened: Luxury Inline Search Header */
-            <div className="flex items-center justify-between h-16 sm:h-[68px] gap-3 sm:gap-6">
-              {/* Left: Brand Logo */}
-              <Link
-                href="/"
-                className="flex items-center gap-2 group shrink-0"
-                onClick={() => setIsSearchOpen(false)}
+            {/* Mobile: Hamburger & Search */}
+            <div className="flex items-center lg:hidden">
+              <button
+                type="button"
+                aria-label="Open menu"
+                onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
+                className="w-11 h-11 flex items-center justify-center text-[#1C1C1B] hover:text-[#6F6556] active:scale-95 transition-transform"
               >
-                <span className="text-base sm:text-lg font-bold tracking-[0.18em] uppercase text-white">
-                  Gloria Times
-                </span>
-              </Link>
-
-              {/* Center: Luxury Search Input */}
-              <div className="flex-1 max-w-[650px] mx-2 sm:mx-6 relative">
-                <form onSubmit={handleSearchSubmit} className="relative w-full">
-                  <input
-                    ref={searchInputRef}
-                    type="text"
-                    value={searchQuery}
-                    onChange={(e) => setSearchQuery(e.target.value)}
-                    placeholder="Search watches, brands, models..."
-                    className="w-full h-10 sm:h-11 pl-4 pr-11 text-sm bg-white/10 text-white placeholder:text-gray-400 rounded-lg border border-white/20 focus:outline-none focus:ring-1 focus:ring-[#F2C27B] focus:border-[#F2C27B] transition-all shadow-inner backdrop-blur-md"
-                  />
-                  <button
-                    type="submit"
-                    aria-label="Submit search"
-                    className="absolute right-0 top-0 h-10 sm:h-11 w-11 flex items-center justify-center text-gray-400 hover:text-[#F2C27B] transition-colors"
+                {isMobileMenuOpen ? (
+                  <X className="w-5 h-5" strokeWidth={1.75} />
+                ) : (
+                  <svg
+                    width="20"
+                    height="20"
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    stroke="currentColor"
+                    strokeWidth="1.75"
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    aria-hidden="true"
                   >
-                    <Search className="h-4 w-4 sm:h-5 sm:w-5" strokeWidth={1.8} />
-                  </button>
-                </form>
+                    <line x1="4" y1="8" x2="20" y2="8"></line>
+                    <line x1="4" y1="16" x2="20" y2="16"></line>
+                  </svg>
+                )}
+              </button>
 
-                {/* Predictive Search Dropdown Card */}
-                <div className="absolute left-0 top-full mt-2 w-full bg-[#0D111A] text-white rounded-xl shadow-2xl border border-white/15 z-50 overflow-hidden backdrop-blur-xl">
-                  {searchQuery.trim() === "" ? (
-                    <div className="p-4 text-left">
-                      <p className="text-[11px] font-bold uppercase tracking-[0.16em] text-gray-400 mb-2.5">
-                        Popular Categories
-                      </p>
-                      <div className="flex flex-wrap gap-2">
-                        {availableCategories.slice(0, 8).map((cat) => (
-                          <button
-                            key={cat}
-                            type="button"
-                            onClick={() => handleSelectCategory(cat)}
-                            className="text-xs font-medium px-3 py-1.5 bg-white/10 hover:bg-[#F2C27B] hover:text-black text-gray-200 rounded-full transition-colors"
-                          >
-                            {cat}
-                          </button>
-                        ))}
-                      </div>
-                    </div>
-                  ) : filteredProducts.length > 0 ? (
-                    <div className="p-3 text-left">
-                      <p className="text-[10px] font-bold uppercase tracking-[0.16em] text-gray-400 px-2 mb-2">
-                        Watches ({filteredProducts.length})
-                      </p>
-                      <div className="divide-y divide-white/10">
-                        {filteredProducts.map((p) => (
-                          <div
-                            key={p.id}
-                            onClick={() => handleSelectProduct(p.id)}
-                            className="flex items-center gap-3 p-2 hover:bg-white/10 rounded-lg cursor-pointer transition-colors"
-                          >
-                            <div className="relative h-12 w-12 rounded-lg border border-white/10 overflow-hidden bg-white/5 shrink-0">
-                              <Image
-                                src={p.imgs?.thumbnails[0] || "/images/logo.png"}
-                                alt={p.title}
-                                fill
-                                className="object-contain p-1"
-                              />
-                            </div>
-                            <div className="flex-1 min-w-0">
-                              <span className="block text-[10px] uppercase tracking-wider text-[#F2C27B] font-semibold">
-                                {p.brand}
-                              </span>
-                              <p className="text-xs font-semibold text-white truncate">
-                                {p.title}
-                              </p>
-                              <p className="text-xs font-bold text-emerald-400 mt-0.5">
-                                {formatPkr(p.discountedPrice || p.price)}
-                              </p>
-                            </div>
-                          </div>
-                        ))}
-                      </div>
-                      <div className="mt-2 pt-2 border-t border-white/10 text-center">
-                        <button
-                          type="button"
-                          onClick={handleSearchSubmit}
-                          className="text-xs font-semibold text-[#F2C27B] hover:underline py-1"
-                        >
-                          View all results for &quot;{searchQuery}&quot; →
-                        </button>
-                      </div>
-                    </div>
-                  ) : (
-                    <div className="p-6 text-center text-gray-400 text-xs">
-                      No watches found matching &quot;{searchQuery}&quot;.
-                    </div>
-                  )}
-                </div>
-              </div>
-
-              {/* Right: Close Search Button */}
-              <div className="flex items-center gap-2 shrink-0">
-                <button
-                  type="button"
-                  onClick={() => setIsSearchOpen(false)}
-                  className="flex items-center justify-center w-10 h-10 rounded-full text-gray-300 hover:text-white hover:bg-white/10 transition-colors"
-                  aria-label="Close search"
-                >
-                  <X className="h-5 w-5" />
-                </button>
-              </div>
+              <button
+                type="button"
+                aria-label="Search"
+                onClick={() => setIsSearchOpen(true)}
+                className="w-11 h-11 flex items-center justify-center text-[#1C1C1B] hover:text-[#6F6556] active:scale-95 transition-transform"
+              >
+                <Search className="w-5 h-5" strokeWidth={1.6} />
+              </button>
             </div>
-          )}
+          </div>
+
+          {/* Center Column: Gloria Times Bespoke Logo */}
+          <div className="flex justify-center items-center">
+            <Link
+              href="/"
+              aria-label="Gloria Times home"
+              className="py-1 flex flex-col items-center group cursor-pointer transition-transform hover:scale-[1.01]"
+            >
+              <GloriaLogo
+                size="md"
+                variant="dark"
+                accentColor="#8A7A5C"
+                className="group-hover:opacity-90 transition-opacity"
+              />
+            </Link>
+          </div>
+
+          {/* Right Column: Actions Icons with Hover Tooltips */}
+          <div className="flex justify-end items-center gap-1 sm:gap-2">
+            {/* Search Button with Tooltip */}
+            <div className="relative group/tip flex flex-col items-center">
+              <button
+                type="button"
+                aria-label="Search"
+                onClick={() => setIsSearchOpen(true)}
+                className="hidden lg:flex w-10 h-10 items-center justify-center text-[#1C1C1B] hover:text-[#6F6556] rounded-full hover:bg-black/5 transition"
+              >
+                <Search className="w-5 h-5" strokeWidth={1.5} />
+              </button>
+              <span className="pointer-events-none absolute -bottom-7 left-1/2 -translate-x-1/2 px-2 py-0.5 rounded bg-[#1C1C1B] text-[#EEEBE6] text-[10px] font-medium tracking-wider uppercase opacity-0 group-hover/tip:opacity-100 transition-all duration-200 shadow-md whitespace-nowrap z-50">
+                Search
+              </span>
+            </div>
+
+            {/* Wishlist Button with Tooltip */}
+            <div className="relative group/tip flex flex-col items-center">
+              <Link
+                href="/wishlist"
+                aria-label="Wishlist"
+                className="relative hidden sm:flex w-10 h-10 items-center justify-center text-[#1C1C1B] hover:text-[#6F6556] rounded-full hover:bg-black/5 transition"
+              >
+                <Heart className="w-5 h-5" strokeWidth={1.5} />
+                {wishlistItems.length > 0 && (
+                  <span className="absolute top-1.5 right-1.5 flex h-4 min-w-[16px] px-1 items-center justify-center rounded-full bg-[#1C1C1B] text-[10px] font-bold text-[#EEEBE6]">
+                    {wishlistItems.length}
+                  </span>
+                )}
+              </Link>
+              <span className="pointer-events-none absolute -bottom-7 left-1/2 -translate-x-1/2 px-2 py-0.5 rounded bg-[#1C1C1B] text-[#EEEBE6] text-[10px] font-medium tracking-wider uppercase opacity-0 group-hover/tip:opacity-100 transition-all duration-200 shadow-md whitespace-nowrap z-50">
+                Wishlist
+              </span>
+            </div>
+
+            {/* Bag / Cart Button with Tooltip */}
+            <div className="relative group/tip flex flex-col items-center">
+              <button
+                type="button"
+                aria-label="Shopping Bag"
+                onClick={openCartModal}
+                className="relative w-10 h-10 flex items-center justify-center text-[#1C1C1B] hover:text-[#6F6556] rounded-full hover:bg-black/5 active:scale-95 transition"
+              >
+                <ShoppingBag className="w-5 h-5" strokeWidth={1.5} />
+                {totalCartCount > 0 && (
+                  <span className="absolute top-1.5 right-1.5 flex h-4 min-w-[16px] px-1 items-center justify-center rounded-full bg-[#1C1C1B] text-[10px] font-bold text-[#EEEBE6]">
+                    {totalCartCount}
+                  </span>
+                )}
+              </button>
+              <span className="pointer-events-none absolute -bottom-7 left-1/2 -translate-x-1/2 px-2 py-0.5 rounded bg-[#1C1C1B] text-[#EEEBE6] text-[10px] font-medium tracking-wider uppercase opacity-0 group-hover/tip:opacity-100 transition-all duration-200 shadow-md whitespace-nowrap z-50">
+                Bag
+              </span>
+            </div>
+          </div>
         </div>
       </header>
 
-      {/* Mobile Drawer Menu */}
-      {isMobileMenuOpen && (
-        <div className="lg:hidden fixed inset-0 z-99999 bg-black/70 backdrop-blur-sm">
-          <div className="w-[85%] max-w-[320px] h-full bg-[#0B0F19] text-white p-6 flex flex-col justify-between shadow-2xl border-r border-white/10">
-            <div>
-              {/* Drawer Header */}
-              <div className="flex items-center justify-between pb-5 border-b border-white/10 mb-6">
-                <span className="text-sm font-bold tracking-[0.2em] uppercase text-white">
-                  GLORIA TIMES
-                </span>
+      {/* 3. Search Overlay Panel */}
+      {isSearchOpen && (
+        <div className="absolute left-0 top-full w-full bg-[#EEEBE6] border-b border-[#D9D4CC] shadow-2xl transition-all animate-fadeIn">
+          <div className="max-w-3xl mx-auto px-4 py-5">
+            <form onSubmit={handleSearchSubmit} className="relative">
+              <input
+                ref={searchInputRef}
+                type="text"
+                value={searchQuery}
+                onChange={(e) => setSearchQuery(e.target.value)}
+                placeholder="Search Rolex, Tissot, Automatic watches, accessories..."
+                className="w-full h-12 sm:h-14 pl-12 pr-12 rounded-sm bg-white border border-[#D9D4CC] text-[#1C1C1B] placeholder-[#8E887F] text-sm sm:text-base focus:outline-none focus:border-[#1C1C1B] shadow-inner transition"
+              />
+              <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-[#8E887F]" />
+              {searchQuery ? (
                 <button
                   type="button"
-                  onClick={() => setIsMobileMenuOpen(false)}
-                  className="p-1 rounded text-gray-400 hover:text-white"
-                  aria-label="Close menu"
+                  onClick={() => setSearchQuery("")}
+                  className="absolute right-4 top-1/2 -translate-y-1/2 text-[#8E887F] hover:text-[#1C1C1B]"
                 >
-                  <X className="h-6 w-6" />
+                  <X className="w-5 h-5" />
                 </button>
-              </div>
+              ) : (
+                <button
+                  type="button"
+                  onClick={() => setIsSearchOpen(false)}
+                  className="absolute right-4 top-1/2 -translate-y-1/2 text-[#8E887F] hover:text-[#1C1C1B]"
+                >
+                  <X className="w-5 h-5" />
+                </button>
+              )}
+            </form>
 
-              {/* Drawer Links */}
-              <nav className="flex flex-col gap-4 text-sm font-medium uppercase tracking-wider">
-                <Link
-                  href="/"
-                  className={`py-1.5 transition-colors ${
-                    pathname === "/" ? "text-[#F2C27B] font-bold" : "text-gray-300"
-                  }`}
-                >
-                  Home
-                </Link>
-                <Link
-                  href="/shop-without-sidebar"
-                  className={`py-1.5 transition-colors ${
-                    pathname === "/shop-without-sidebar" ? "text-[#F2C27B] font-bold" : "text-gray-300"
-                  }`}
-                >
-                  All Products
-                </Link>
-                <Link
-                  href="/category/accessories"
-                  className={`py-1.5 transition-colors ${
-                    isAccessoryRoute ? "text-[#F2C27B] font-bold" : "text-gray-300"
-                  }`}
-                >
-                  Accessories
-                </Link>
-                <div className="pl-3 flex flex-col gap-2.5 border-l border-white/10 my-1">
-                  {accessoryLinks.map((acc) => (
-                    <Link
-                      key={acc.name}
-                      href={acc.href}
-                      className="text-xs text-gray-400 hover:text-white capitalize"
+            {/* Quick search tags or results */}
+            {searchQuery.trim() ? (
+              <div className="mt-4 bg-white rounded-sm border border-[#D9D4CC] p-3 shadow-sm max-h-[380px] overflow-y-auto">
+                <div className="text-[11px] font-semibold uppercase tracking-wider text-[#8E887F] px-2 py-1">
+                  Matching Timepieces
+                </div>
+                {filteredProducts.length > 0 ? (
+                  <div className="divide-y divide-gray-100">
+                    {filteredProducts.map((item) => (
+                      <div
+                        key={item.id}
+                        onClick={() => handleSelectProduct(item.id)}
+                        className="flex items-center gap-3.5 p-2 hover:bg-[#F7F4EE] rounded cursor-pointer transition"
+                      >
+                        <div className="relative h-12 w-12 bg-[#F0EDE8] rounded shrink-0 overflow-hidden">
+                          {((item.imgs?.thumbnails && item.imgs.thumbnails[0]) ||
+                            (item.imgs?.previews && item.imgs.previews[0]) ||
+                            (item.variants && item.variants[0]?.image)) && (
+                            <Image
+                              src={
+                                (item.imgs?.thumbnails && item.imgs.thumbnails[0]) ||
+                                (item.imgs?.previews && item.imgs.previews[0]) ||
+                                (item.variants && item.variants[0]?.image) ||
+                                ""
+                              }
+                              alt={item.title}
+                              fill
+                              className="object-contain p-1"
+                            />
+                          )}
+                        </div>
+                        <div className="flex-1 min-w-0">
+                          <p className="text-xs text-[#8E887F] uppercase tracking-wider truncate">
+                            {item.brand}
+                          </p>
+                          <p className="text-sm font-medium text-[#1C1C1B] truncate">
+                            {item.title}
+                          </p>
+                        </div>
+                        <span className="text-xs font-semibold text-[#1C1C1B] shrink-0">
+                          Rs. {item.price?.toLocaleString()}
+                        </span>
+                      </div>
+                    ))}
+                    <button
+                      type="button"
+                      onClick={handleSearchSubmit}
+                      className="w-full mt-2 py-2 text-center text-xs font-semibold text-[#1C1C1B] hover:text-[#6F6556] flex items-center justify-center gap-1.5"
                     >
-                      {acc.name}
-                    </Link>
-                  ))}
-                </div>
-                <div className="pt-2 text-xs font-bold text-gray-500 uppercase tracking-widest">
-                  Categories
-                </div>
-                <div className="grid grid-cols-1 sm:grid-cols-2 gap-1.5">
-                  {availableCategories.map((cat) => (
-                    <Link
-                      key={cat}
-                      href={`/shop-without-sidebar?category=${encodeURIComponent(cat)}`}
-                      onClick={() => setIsMobileMenuOpen(false)}
-                      className="text-xs text-gray-300 hover:text-[#F2C27B] py-1 transition-colors truncate"
+                      <span>View all results for &quot;{searchQuery}&quot;</span>
+                      <ArrowRight className="w-3.5 h-3.5" />
+                    </button>
+                  </div>
+                ) : (
+                  <p className="text-xs text-gray-500 py-3 text-center">
+                    No timepieces found for &quot;{searchQuery}&quot;. Press enter to search catalog.
+                  </p>
+                )}
+              </div>
+            ) : (
+              <div className="mt-3 flex items-center gap-2 flex-wrap text-xs text-[#5E5A54]">
+                <span className="text-[#8E887F] font-medium">Popular:</span>
+                {["Rolex", "Tissot PRX", "Cartier", "Hublot", "Automatic", "Accessories"].map(
+                  (tag) => (
+                    <button
+                      key={tag}
+                      type="button"
+                      onClick={() => {
+                        setSearchQuery(tag);
+                        router.push(`/shop-without-sidebar?q=${encodeURIComponent(tag)}`);
+                        setIsSearchOpen(false);
+                      }}
+                      className="px-2.5 py-1 bg-white hover:bg-[#FAF8F5] border border-[#D9D4CC] rounded-full text-[#1C1C1B] transition"
                     >
-                      {cat}
-                    </Link>
-                  ))}
-                </div>
+                      {tag}
+                    </button>
+                  )
+                )}
+              </div>
+            )}
+          </div>
+        </div>
+      )}
+
+      {/* 4. Mobile Menu Drawer */}
+      {isMobileMenuOpen && (
+        <div className="fixed inset-0 top-[92px] sm:top-[96px] z-50 bg-black/40 backdrop-blur-sm lg:hidden animate-fadeIn">
+          <div className="bg-[#EEEBE6] w-full max-w-[340px] h-full shadow-2xl p-6 flex flex-col justify-between overflow-y-auto border-r border-[#D9D4CC]">
+            <div className="space-y-6">
+              <nav className="flex flex-col divide-y divide-[#D9D4CC]">
+                {navLinks.map((link) => (
+                  <Link
+                    key={link.name}
+                    href={link.href}
+                    onClick={() => setIsMobileMenuOpen(false)}
+                    className="py-3.5 text-base font-medium text-[#1C1C1B] hover:text-[#6F6556] flex items-center justify-between"
+                  >
+                    <span>{link.name}</span>
+                    <ArrowRight className="w-4 h-4 text-[#8E887F]" />
+                  </Link>
+                ))}
                 <Link
-                  href="/contact"
-                  className={`py-1.5 transition-colors ${
-                    pathname === "/contact" ? "text-[#F2C27B] font-bold" : "text-gray-300"
-                  }`}
+                  href="/wishlist"
+                  onClick={() => setIsMobileMenuOpen(false)}
+                  className="py-3.5 text-base font-medium text-[#1C1C1B] hover:text-[#6F6556] flex items-center justify-between"
                 >
-                  Contact Us
+                  <span className="flex items-center gap-2.5">
+                    <Heart className="w-4 h-4" />
+                    <span>Wishlist</span>
+                  </span>
+                  {wishlistItems.length > 0 && (
+                    <span className="h-5 px-2 rounded-full bg-[#1C1C1B] text-white text-xs font-bold flex items-center justify-center">
+                      {wishlistItems.length}
+                    </span>
+                  )}
                 </Link>
               </nav>
             </div>
 
-            <div className="pt-6 border-t border-white/10 text-xs text-gray-400">
-              <p className="font-semibold text-white mb-1">Gloria Times Boutique</p>
-              <p>Near UMT, PIA Road, Johar Town, Lahore</p>
+            <div className="pt-6 border-t border-[#D9D4CC]">
+              <p className="text-xs text-[#8E887F] text-center">
+                Gloria Times · Fine Watches of Distinction
+              </p>
             </div>
           </div>
         </div>
@@ -725,4 +458,3 @@ const Header = () => {
 };
 
 export default Header;
-

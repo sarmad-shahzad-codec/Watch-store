@@ -98,8 +98,8 @@ const PreviewSliderModal = () => {
         <SwiperSlide>
           <div className="flex justify-center items-center">
             <Image
-              src={"/images/products/product-2-bg-1.png"}
-              alt={"product image"}
+              src={"/images/hero-lineup/tissot.webp"}
+              alt={"Gloria Times Luxury Watch"}
               width={450}
               height={450}
             />
@@ -108,8 +108,8 @@ const PreviewSliderModal = () => {
         <SwiperSlide>
           <div className="flex justify-center items-center">
             <Image
-              src={"/images/products/product-2-bg-1.png"}
-              alt={"product image"}
+              src={"/images/hero-lineup/cartier.webp"}
+              alt={"Gloria Times Luxury Watch"}
               width={450}
               height={450}
             />

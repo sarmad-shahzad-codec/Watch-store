@@ -1,23 +1,19 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import React, { useState, useEffect } from "react";
 import Image from "next/image";
 import Link from "next/link";
-import { ChevronLeft, ChevronRight } from "lucide-react";
+import { ArrowRight, ChevronLeft, ChevronRight } from "lucide-react";
 import { HERO_WATCH_IMAGES } from "@/constants/heroWatchImages";
 
 interface HeroSlide {
   id: number;
   image: string;
-  subtitle: string;
-  title: string;
-  description: string;
-}
-
-interface ProductCard {
-  id: number;
-  image: string;
-  title: string;
+  badge: string;
+  model: string;
+  price: string;
+  category: string;
+  link: string;
   description: string;
 }
 
@@ -25,70 +21,53 @@ const heroSlides: HeroSlide[] = [
   {
     id: 1,
     image: HERO_WATCH_IMAGES.main,
-    subtitle: "Introducing",
-    title: "GLORIA TIMES",
-    description:
-      "Curated timepieces from leading maisons—precision movements, enduring design, and the quiet confidence of true luxury. Discover watches crafted for those who measure moments in excellence.",
+    badge: "Featured Masterpiece",
+    model: "Rolex Submariner Date",
+    price: "Rs. 34,500",
+    category: "Master Diver",
+    link: "/shop-without-sidebar?q=submariner",
+    description: "Cerachrom ceramic bezel, 3135 automatic movement, and oyster steel finish.",
   },
   {
     id: 2,
     image: HERO_WATCH_IMAGES.tissot,
-    subtitle: "Explore",
-    title: "TISSOT PRX",
-    description:
-      "Integrated bracelet, sunburst dial, and unmistakable 1970s sport-chic lines. The PRX delivers Swiss automatic performance with everyday versatility—modern heritage on the wrist.",
+    badge: "Bestseller",
+    model: "Tissot PRX Powermatic 80",
+    price: "Rs. 24,500",
+    category: "Swiss Automatic",
+    link: "/shop-without-sidebar?q=tissot",
+    description: "Integrated bracelet, sunburst dial, and 80-hour power reserve.",
   },
   {
     id: 3,
     image: HERO_WATCH_IMAGES.hublot,
-    subtitle: "Feel",
-    title: "HUBLOT BIG BANG",
-    description:
-      "Fusion materials, skeleton architecture, and bold proportions define the Big Bang. A technical statement piece built for collectors who want innovation without compromise.",
+    badge: "High Horology",
+    model: "Hublot Big Bang Skeleton",
+    price: "Rs. 38,000",
+    category: "Fusion Architecture",
+    link: "/shop-without-sidebar?q=hublot",
+    description: "Multi-component fusion case with openwork skeleton mechanics.",
   },
   {
     id: 4,
     image: HERO_WATCH_IMAGES.tagHeuer,
-    subtitle: "Experience",
-    title: "TAG HEUER CARRERA",
-    description:
-      "Clean dial geometry and motorsport heritage meet refined ergonomics. The Carrera remains the definitive three-hand chronograph for distinguished daily wear.",
-  },
-];
-
-const productCards: ProductCard[] = [
-  {
-    id: 1,
-    image: HERO_WATCH_IMAGES.tissot,
-    title: "EXPLORE THE TISSOT PRX",
-    description:
-      "Sport-elegant integrated bracelet design with Swiss automatic heart.",
-  },
-  {
-    id: 2,
-    image: HERO_WATCH_IMAGES.hublot,
-    title: "FEEL THE HUBLOT BIG BANG",
-    description:
-      "Skeleton dial and fusion case—engineering as sculpture on the wrist.",
-  },
-  {
-    id: 3,
-    image: HERO_WATCH_IMAGES.tagHeuer,
-    title: "EXPERIENCE THE TAG HEUER CARRERA",
-    description:
-      "Racing pedigree and timeless proportions for the modern collector.",
+    badge: "Racing Legend",
+    model: "TAG Heuer Carrera Chrono",
+    price: "Rs. 28,500",
+    category: "Motorsport Heritage",
+    link: "/shop-without-sidebar?q=tag",
+    description: "Tricompax chronograph dials with high-precision Swiss caliber.",
   },
 ];
 
 const Hero = () => {
   const [currentSlide, setCurrentSlide] = useState(0);
-  const [currentProduct, setCurrentProduct] = useState(0);
 
   useEffect(() => {
-    const interval = setInterval(() => {
+    const timer = setInterval(() => {
       setCurrentSlide((prev) => (prev + 1) % heroSlides.length);
-    }, 8000);
-    return () => clearInterval(interval);
+    }, 7000);
+    return () => clearInterval(timer);
   }, []);
 
   const nextSlide = () => {
@@ -99,232 +78,334 @@ const Hero = () => {
     setCurrentSlide((prev) => (prev - 1 + heroSlides.length) % heroSlides.length);
   };
 
-  const nextProduct = () => {
-    setCurrentProduct((prev) => (prev + 1) % productCards.length);
-  };
-
-  const prevProduct = () => {
-    setCurrentProduct((prev) => (prev - 1 + productCards.length) % productCards.length);
-  };
-
-  const activeProduct = productCards[currentProduct];
+  const current = heroSlides[currentSlide];
 
   return (
-    <section className="overflow-hidden bg-[#1F1209] pt-[calc(6.25rem+env(safe-area-inset-top))] pb-0 text-white">
-      <div className="w-full mx-auto max-w-[100vw]">
-        {/* Hero slider */}
-        <div
-          className="relative flex flex-col lg:flex-row lg:items-center lg:gap-6 xl:gap-10 rounded-none lg:rounded-sm overflow-visible mb-0 min-h-[min(92vh,820px)] lg:min-h-[420px] xl:min-h-[460px]"
-          style={{
-            backgroundImage: `url('${HERO_WATCH_IMAGES.woodenBg}')`,
-            backgroundSize: "cover",
-            backgroundPosition: "center",
-          }}
-        >
-          {/* Readability veil — stronger on small screens for contrast */}
-          <div
-            className="pointer-events-none absolute inset-0 bg-gradient-to-b from-black/35 via-black/25 to-black/45 lg:bg-gradient-to-r lg:from-black/30 lg:via-transparent lg:to-black/20"
-            aria-hidden
-          />
+    <section
+      className="w-full bg-[#EEEBE6] text-[#1C1C1B] pt-[92px] lg:pt-[112px] transition-colors"
+      style={{ fontFamily: "'Instrument Sans', sans-serif" }}
+    >
+      <div className="w-full max-w-[1440px] mx-auto">
+        {/* ============================================================== */}
+        {/* DESKTOP LAYOUT (Matches HeroDesktop.dc.html)                   */}
+        {/* ============================================================== */}
+        <div className="hidden lg:grid grid-cols-[500px_minmax(0,1fr)] xl:grid-cols-[540px_minmax(0,1fr)] gap-6 xl:gap-8 px-8 xl:px-12 py-8 min-h-[780px]">
+          {/* Left Column */}
+          <div className="flex flex-col justify-between py-2 pr-4">
+            {/* Top Text & CTAs */}
+            <div className="flex flex-col gap-6">
+              <div className="text-[13px] font-medium text-[#5E5A54] tracking-wide">
+                New collection · 2026
+              </div>
 
-          {/* Prev — 44px min touch target */}
-          <button
-            type="button"
-            onClick={prevSlide}
-            className="absolute left-2 sm:left-4 top-[42%] z-20 flex h-11 w-11 sm:h-12 sm:w-12 items-center justify-center rounded-full bg-black/25 text-[#F2C27B] backdrop-blur-[2px] transition-colors hover:bg-black/40 hover:text-white active:scale-95 lg:top-1/2 lg:-translate-y-1/2"
-            aria-label="Previous slide"
-          >
-            <ChevronLeft className="h-7 w-7 sm:h-8 sm:w-8" strokeWidth={1.75} />
-          </button>
+              <h1 className="m-0 text-[56px] xl:text-[66px] font-medium leading-[1.02] tracking-[-2.2px] text-[#1C1C1B]">
+                Time, worn with glory.
+              </h1>
 
-          {/* Copy — first on mobile for readable hierarchy */}
-          <div className="relative z-10 order-1 flex flex-1 flex-col justify-center px-5 pt-6 pb-4 sm:px-8 sm:pt-8 sm:pb-6 lg:order-2 lg:max-w-[52%] lg:px-10 xl:px-14 lg:py-10 lg:pr-8 xl:pr-12">
-            <p className="text-[10px] sm:text-xs tracking-[0.28em] sm:tracking-[0.35em] uppercase text-[#F2C27B] mb-2 sm:mb-3">
-              {heroSlides[currentSlide].subtitle}
-            </p>
-            <h1 className="text-[1.65rem] leading-tight xsm:text-[1.85rem] sm:text-4xl lg:text-5xl font-semibold tracking-[0.08em] sm:tracking-[0.18em] lg:tracking-[0.22em] text-[#F7D08A] mb-3 sm:mb-4">
-              {heroSlides[currentSlide].title}
+              <p className="m-0 max-w-[440px] text-[16px] xl:text-[17px] leading-[1.6] text-[#5E5A54]">
+                Classic, dress and everyday watches, picked for every wrist and
+                every occasion.
+              </p>
+
+              {/* Action Buttons */}
+              <div className="flex items-center gap-3 pt-1">
+                <Link
+                  href="/shop-without-sidebar"
+                  className="h-[52px] px-7 flex items-center gap-2.5 bg-[#1C1C1B] text-[#EEEBE6] hover:bg-black rounded-[2px] text-[15px] font-medium transition shadow-sm active:scale-[0.99]"
+                >
+                  <span>Shop the collection</span>
+                  <ArrowRight className="w-4 h-4" strokeWidth={1.75} />
+                </Link>
+
+                <Link
+                  href="/shop-without-sidebar?sort=newest"
+                  className="h-[52px] px-6 flex items-center border border-[#1C1C1B] hover:bg-[#1C1C1B]/5 text-[#1C1C1B] rounded-[2px] text-[15px] font-medium transition"
+                >
+                  New in
+                </Link>
+              </div>
+
+              {/* Filter Pills */}
+              <div className="flex items-center gap-2 flex-wrap pt-1">
+                {[
+                  { label: "Men", href: "/category/men" },
+                  {
+                    label: "Women",
+                    href: "/category/women",
+                  },
+                  {
+                    label: "Automatic",
+                    href: "/shop-without-sidebar?q=automatic",
+                  },
+                  {
+                    label: "Minimal",
+                    href: "/shop-without-sidebar?q=minimal",
+                  },
+                ].map((pill) => (
+                  <Link
+                    key={pill.label}
+                    href={pill.href}
+                    className="h-10 px-4.5 flex items-center border border-[#CFC9BF] hover:border-[#1C1C1B] hover:text-[#1C1C1B] rounded-full text-[14px] font-medium text-[#1C1C1B] transition"
+                  >
+                    {pill.label}
+                  </Link>
+                ))}
+              </div>
+            </div>
+
+            {/* Bottom Category Cards: Men & Women */}
+            <div className="grid grid-cols-2 gap-4 pt-10">
+              {/* Men's Watches Card */}
+              <Link
+                href="/category/men"
+                className="group flex flex-col gap-2.5 text-decoration-none"
+              >
+                <div className="relative h-[190px] w-full bg-[#D8D3CB] rounded-[2px] overflow-hidden flex items-center justify-center transition-transform duration-300 group-hover:shadow-md">
+                  <Image
+                    src="/images/2s/rolex-submariner-1.jpg"
+                    alt="Men's watches"
+                    fill
+                    sizes="260px"
+                    className="object-cover object-center transition-transform duration-500 group-hover:scale-105"
+                  />
+                  <div className="absolute inset-0 bg-black/5 group-hover:bg-transparent transition-colors" />
+                </div>
+                <span className="flex justify-between items-center text-[14px] font-medium text-[#1C1C1B] group-hover:text-[#6F6556] transition-colors">
+                  <span>Men&apos;s watches</span>
+                  <ArrowRight
+                    className="w-4 h-4 transition-transform group-hover:translate-x-1"
+                    strokeWidth={1.75}
+                  />
+                </span>
+              </Link>
+
+              {/* Women's Watches Card */}
+              <Link
+                href="/category/women"
+                className="group flex flex-col gap-2.5 text-decoration-none"
+              >
+                <div className="relative h-[190px] w-full bg-[#D8D3CB] rounded-[2px] overflow-hidden flex items-center justify-center transition-transform duration-300 group-hover:shadow-md">
+                  <Image
+                    src="/images/2s/cartier-tank-1.jpg"
+                    alt="Women's watches"
+                    fill
+                    sizes="260px"
+                    className="object-cover object-center transition-transform duration-500 group-hover:scale-105"
+                  />
+                  <div className="absolute inset-0 bg-black/5 group-hover:bg-transparent transition-colors" />
+                </div>
+                <span className="flex justify-between items-center text-[14px] font-medium text-[#1C1C1B] group-hover:text-[#6F6556] transition-colors">
+                  <span>Women&apos;s watches</span>
+                  <ArrowRight
+                    className="w-4 h-4 transition-transform group-hover:translate-x-1"
+                    strokeWidth={1.75}
+                  />
+                </span>
+              </Link>
+            </div>
+          </div>
+
+          {/* Right Column: Hero Photo Showcase with Floating Product Card */}
+          <div className="relative flex flex-col justify-end rounded-[2px] overflow-hidden bg-[#D8D3CB] min-h-[640px] xl:min-h-[700px] shadow-sm">
+            {/* Main Watch Photo */}
+            <div className="absolute inset-0 flex items-center justify-center p-8">
+              <Image
+                key={current.id}
+                src={current.image}
+                alt={current.model}
+                fill
+                priority
+                sizes="(max-width: 1440px) 50vw, 750px"
+                className="object-contain p-6 sm:p-10 drop-shadow-[0_25px_45px_rgba(0,0,0,0.35)] transition-all duration-700 ease-out"
+              />
+            </div>
+
+            {/* Subtle Gradient Veil */}
+            <div className="pointer-events-none absolute inset-0 bg-gradient-to-t from-black/25 via-transparent to-transparent" />
+
+            {/* Floating Featured Product Card (Bottom Left) */}
+            <Link
+              href={current.link}
+              className="absolute left-6 bottom-6 w-[330px] p-3.5 bg-[#EEEBE6]/95 backdrop-blur-md border border-[#CFC9BF] rounded-[2px] flex items-center gap-3.5 shadow-xl hover:bg-white transition-all group"
+            >
+              <div className="relative w-[72px] h-[72px] bg-[#D8D3CB] rounded-[2px] overflow-hidden shrink-0">
+                <Image
+                  src={current.image}
+                  alt={current.model}
+                  fill
+                  sizes="72px"
+                  className="object-contain p-1"
+                />
+              </div>
+
+              <div className="flex-1 min-w-0 flex flex-col gap-0.5">
+                <span className="text-[11px] font-medium text-[#5E5A54] uppercase tracking-wider">
+                  {current.badge}
+                </span>
+                <span className="text-[15px] font-semibold text-[#1C1C1B] truncate group-hover:text-[#6F6556] transition-colors">
+                  {current.model}
+                </span>
+                <span className="text-[14px] font-medium text-[#1C1C1B]">
+                  {current.price}
+                </span>
+              </div>
+
+              <ArrowRight
+                className="w-4 h-4 text-[#1C1C1B] shrink-0 group-hover:translate-x-1 transition-transform"
+                strokeWidth={1.75}
+              />
+            </Link>
+
+            {/* Prev / Next Slide Buttons (Bottom Right) */}
+            <div className="absolute right-6 bottom-6 flex items-center gap-2">
+              <button
+                type="button"
+                aria-label="Previous slide"
+                onClick={prevSlide}
+                className="w-11 h-11 rounded-full bg-[#EEEBE6]/95 hover:bg-white text-[#1C1C1B] border border-[#CFC9BF] flex items-center justify-center cursor-pointer shadow-md active:scale-95 transition"
+              >
+                <ChevronLeft className="w-5 h-5" strokeWidth={1.75} />
+              </button>
+
+              <button
+                type="button"
+                aria-label="Next slide"
+                onClick={nextSlide}
+                className="w-11 h-11 rounded-full bg-[#EEEBE6]/95 hover:bg-white text-[#1C1C1B] border border-[#CFC9BF] flex items-center justify-center cursor-pointer shadow-md active:scale-95 transition"
+              >
+                <ChevronRight className="w-5 h-5" strokeWidth={1.75} />
+              </button>
+            </div>
+          </div>
+        </div>
+
+        {/* ============================================================== */}
+        {/* MOBILE LAYOUT (Matches HeroMobile.dc.html)                     */}
+        {/* ============================================================== */}
+        <div className="flex flex-col lg:hidden px-4 pt-3 pb-8">
+          {/* Top Hero Photo Card */}
+          <div className="relative w-full h-[380px] bg-[#D8D3CB] rounded-[2px] overflow-hidden flex items-center justify-center shadow-sm">
+            <Image
+              key={current.id}
+              src={current.image}
+              alt={current.model}
+              fill
+              priority
+              sizes="100vw"
+              className="object-contain p-6 drop-shadow-[0_20px_35px_rgba(0,0,0,0.3)] transition-all duration-500"
+            />
+
+            {/* Floating Slide Tag */}
+            <div className="absolute left-3 top-3 px-3 py-1 bg-[#EEEBE6]/90 backdrop-blur-sm rounded-full text-[11px] font-semibold text-[#1C1C1B] border border-[#CFC9BF]">
+              {current.model}
+            </div>
+
+            {/* Slide Arrows */}
+            <div className="absolute right-3 bottom-3 flex items-center gap-1.5">
+              <button
+                type="button"
+                aria-label="Previous slide"
+                onClick={prevSlide}
+                className="w-9 h-9 rounded-full bg-[#EEEBE6]/95 text-[#1C1C1B] border border-[#CFC9BF] flex items-center justify-center active:scale-90 transition shadow-sm"
+              >
+                <ChevronLeft className="w-4 h-4" strokeWidth={1.75} />
+              </button>
+              <button
+                type="button"
+                aria-label="Next slide"
+                onClick={nextSlide}
+                className="w-9 h-9 rounded-full bg-[#EEEBE6]/95 text-[#1C1C1B] border border-[#CFC9BF] flex items-center justify-center active:scale-90 transition shadow-sm"
+              >
+                <ChevronRight className="w-4 h-4" strokeWidth={1.75} />
+              </button>
+            </div>
+          </div>
+
+          {/* Copy & CTAs */}
+          <div className="pt-6 px-1 flex flex-col gap-3.5">
+            <div className="text-[12px] font-medium text-[#5E5A54] tracking-wide">
+              New collection · 2026
+            </div>
+
+            <h1 className="m-0 text-[38px] font-medium leading-[1.05] tracking-[-1.4px] text-[#1C1C1B]">
+              Time, worn with glory.
             </h1>
-            <p className="text-sm sm:text-base leading-relaxed text-[#FDF4E3]/95 max-w-xl mb-6 sm:mb-8 line-clamp-6 sm:line-clamp-none [overflow-wrap:anywhere]">
-              {heroSlides[currentSlide].description}
+
+            <p className="m-0 text-[15px] leading-[1.55] text-[#5E5A54]">
+              Classic, dress and everyday watches, picked for every wrist and
+              every occasion.
             </p>
 
             <Link
               href="/shop-without-sidebar"
-              className="inline-flex min-h-[44px] w-full sm:w-auto items-center justify-center px-8 py-3 bg-white text-[#2B1A0F] text-[11px] sm:text-xs font-medium tracking-[0.22em] sm:tracking-[0.28em] uppercase rounded-sm hover:bg-[#F3E3D0] active:bg-[#ebd5bc] transition text-center"
+              className="w-full h-[50px] mt-1 flex items-center justify-center gap-2 bg-[#1C1C1B] text-[#EEEBE6] rounded-[2px] text-[15px] font-medium active:scale-[0.99] transition shadow-sm"
             >
-              Shop collection
+              <span>Shop the collection</span>
+              <ArrowRight className="w-4 h-4" strokeWidth={1.75} />
             </Link>
-          </div>
 
-          {/* Watch image */}
-          <div className="relative z-10 order-2 flex flex-1 justify-center px-4 pb-28 sm:pb-32 lg:order-1 lg:pb-10 lg:justify-end lg:pr-4 xl:pr-8">
-            <div className="relative w-full max-w-[280px] xsm:max-w-[320px] sm:max-w-[380px] lg:max-w-[420px] xl:max-w-[460px] aspect-[4/5] sm:aspect-square lg:aspect-auto lg:h-[min(52vh,440px)] xl:h-[min(54vh,480px)]">
-              <Image
-                key={heroSlides[currentSlide].id}
-                src={heroSlides[currentSlide].image}
-                alt={heroSlides[currentSlide].title}
-                fill
-                sizes="(max-width: 640px) 85vw, (max-width: 1024px) 45vw, 38vw"
-                className="object-contain object-bottom drop-shadow-[0_25px_50px_rgba(0,0,0,0.55)] transition-opacity duration-500"
-                priority
-              />
+            {/* Filter Pills */}
+            <div className="flex items-center gap-2 flex-wrap pt-1">
+              {[
+                { label: "Men", href: "/category/men" },
+                { label: "Women", href: "/category/women" },
+                {
+                  label: "Automatic",
+                  href: "/shop-without-sidebar?q=automatic",
+                },
+              ].map((pill) => (
+                <Link
+                  key={pill.label}
+                  href={pill.href}
+                  className="h-9 px-4 flex items-center border border-[#CFC9BF] rounded-full text-[13px] font-medium text-[#1C1C1B] active:bg-[#CFC9BF]/20 transition"
+                >
+                  {pill.label}
+                </Link>
+              ))}
             </div>
-          </div>
 
-          {/* Next */}
-          <button
-            type="button"
-            onClick={nextSlide}
-            className="absolute right-2 sm:right-4 top-[42%] z-20 flex h-11 w-11 sm:h-12 sm:w-12 items-center justify-center rounded-full bg-black/25 text-[#F2C27B] backdrop-blur-[2px] transition-colors hover:bg-black/40 hover:text-white active:scale-95 lg:top-1/2 lg:-translate-y-1/2"
-            aria-label="Next slide"
-          >
-            <ChevronRight className="h-7 w-7 sm:h-8 sm:w-8" strokeWidth={1.75} />
-          </button>
-
-          {/* Dots — larger tap targets on mobile */}
-          <div
-            className="absolute bottom-6 sm:bottom-5 left-1/2 z-20 flex -translate-x-1/2 gap-2 sm:gap-2.5 px-4 pb-[env(safe-area-inset-bottom)]"
-            role="tablist"
-            aria-label="Hero slides"
-          >
-            {heroSlides.map((slide, index) => (
-              <button
-                key={slide.id}
-                type="button"
-                role="tab"
-                aria-selected={index === currentSlide}
-                onClick={() => setCurrentSlide(index)}
-                className={`flex h-10 w-10 sm:h-9 sm:w-9 items-center justify-center rounded-full transition-all touch-manipulation ${
-                  index === currentSlide ? "text-[#F2C27B]" : "text-white/50"
-                }`}
-                aria-label={`Go to slide ${index + 1}`}
+            {/* Mobile Category Cards */}
+            <div className="grid grid-cols-2 gap-3 pt-4">
+              <Link
+                href="/category/men"
+                className="group flex flex-col gap-2"
               >
-                <span
-                  className={`block rounded-full transition-all ${
-                    index === currentSlide
-                      ? "h-2 w-8 bg-[#F2C27B]"
-                      : "h-2 w-3 bg-current hover:bg-[#F2C27B]/70"
-                  }`}
-                />
-              </button>
-            ))}
-          </div>
-        </div>
-
-        {/* Product showcase */}
-        <section className="product-showcase border-t border-white/10">
-          {/* Desktop: three columns */}
-          <div className="hidden lg:grid lg:grid-cols-3 lg:gap-0">
-            {productCards.map((card, index) => (
-              <article
-                key={card.id}
-                className={`flex flex-col md:flex-row min-h-[200px] ${
-                  index === 0
-                    ? "bg-[#1D2331]"
-                    : index === 1
-                      ? "bg-[#111111]"
-                      : "bg-[#E5E5E5] text-[#111827]"
-                }`}
-              >
-                <div className="md:w-1/2 p-5 lg:p-6 flex items-center justify-center min-h-[160px]">
-                  <div className="relative h-36 w-full max-w-[200px]">
-                    <Image
-                      src={card.image}
-                      alt={card.title}
-                      fill
-                      className="object-contain"
-                      sizes="200px"
-                    />
-                  </div>
-                </div>
-                <div className="md:w-1/2 p-5 lg:p-6 flex flex-col justify-center">
-                  <h3 className="text-xs lg:text-sm font-semibold mb-2 uppercase tracking-[0.14em] lg:tracking-[0.18em] leading-snug">
-                    {card.title}
-                  </h3>
-                  <p className="text-xs leading-relaxed opacity-90">
-                    {card.description}
-                  </p>
-                </div>
-              </article>
-            ))}
-          </div>
-
-          {/* Mobile / tablet: single card carousel */}
-          <div className="lg:hidden">
-            <article
-              key={activeProduct.id}
-              className={`flex flex-col min-h-0 ${
-                currentProduct === 0
-                  ? "bg-[#1D2331]"
-                  : currentProduct === 1
-                    ? "bg-[#111111]"
-                    : "bg-[#E5E5E5] text-[#111827]"
-              }`}
-            >
-              <div className="relative w-full pt-6 pb-2 px-6 flex justify-center">
-                <div className="relative h-44 w-full max-w-[260px]">
+                <div className="relative h-[150px] w-full bg-[#D8D3CB] rounded-[2px] overflow-hidden">
                   <Image
-                    src={activeProduct.image}
-                    alt={activeProduct.title}
+                    src="/images/2s/rolex-submariner-1.jpg"
+                    alt="Men's watches"
                     fill
-                    className="object-contain"
-                    sizes="260px"
-                    priority={currentProduct === 0}
+                    sizes="180px"
+                    className="object-cover"
                   />
                 </div>
-              </div>
-              <div className="px-6 pb-6 pt-2 text-center sm:text-left sm:px-8 sm:pb-8">
-                <h3 className="text-sm font-semibold mb-2 uppercase tracking-[0.15em] leading-snug">
-                  {activeProduct.title}
-                </h3>
-                <p className="text-xs sm:text-sm leading-relaxed opacity-90 max-w-md mx-auto sm:mx-0">
-                  {activeProduct.description}
-                </p>
-              </div>
-            </article>
+                <span className="flex justify-between items-center text-[13px] font-medium text-[#1C1C1B]">
+                  <span>Men&apos;s watches</span>
+                  <ArrowRight className="w-3.5 h-3.5" />
+                </span>
+              </Link>
 
-            <div className="flex items-center justify-center gap-4 py-4 px-4 bg-[#1F1209] border-t border-white/10">
-              <button
-                type="button"
-                onClick={prevProduct}
-                className="flex h-12 w-12 shrink-0 items-center justify-center rounded-full border border-white/25 text-[#F2C27B] hover:bg-white/10 active:scale-95 transition touch-manipulation"
-                aria-label="Previous product"
+              <Link
+                href="/category/women"
+                className="group flex flex-col gap-2"
               >
-                <ChevronLeft className="h-6 w-6" />
-              </button>
-              <div className="flex items-center gap-2">
-                {productCards.map((card, index) => (
-                  <button
-                    key={card.id}
-                    type="button"
-                    onClick={() => setCurrentProduct(index)}
-                    className={`flex h-10 w-10 items-center justify-center rounded-full touch-manipulation ${
-                      index === currentProduct ? "text-[#F2C27B]" : "text-white/40"
-                    }`}
-                    aria-label={`Go to product ${index + 1}`}
-                  >
-                    <span
-                      className={`rounded-full transition-all ${
-                        index === currentProduct
-                          ? "h-2 w-8 bg-[#F2C27B]"
-                          : "h-2 w-3 bg-current"
-                      }`}
-                    />
-                  </button>
-                ))}
-              </div>
-              <button
-                type="button"
-                onClick={nextProduct}
-                className="flex h-12 w-12 shrink-0 items-center justify-center rounded-full border border-white/25 text-[#F2C27B] hover:bg-white/10 active:scale-95 transition touch-manipulation"
-                aria-label="Next product"
-              >
-                <ChevronRight className="h-6 w-6" />
-              </button>
+                <div className="relative h-[150px] w-full bg-[#D8D3CB] rounded-[2px] overflow-hidden">
+                  <Image
+                    src="/images/2s/cartier-tank-1.jpg"
+                    alt="Women's watches"
+                    fill
+                    sizes="180px"
+                    className="object-cover"
+                  />
+                </div>
+                <span className="flex justify-between items-center text-[13px] font-medium text-[#1C1C1B]">
+                  <span>Women&apos;s watches</span>
+                  <ArrowRight className="w-3.5 h-3.5" />
+                </span>
+              </Link>
             </div>
           </div>
-        </section>
+        </div>
       </div>
     </section>
   );

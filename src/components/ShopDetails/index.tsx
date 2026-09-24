@@ -883,9 +883,8 @@ const ShopDetails = ({ productId }: ShopDetailsProps) => {
           </div>
         </div>
 
-        {/* Recently Viewed Carousel & Product FAQs */}
+        {/* Recently Viewed Carousel */}
         <RecentlyViewdItems />
-        <ProductFaq />
       </div>
     </div>
   );

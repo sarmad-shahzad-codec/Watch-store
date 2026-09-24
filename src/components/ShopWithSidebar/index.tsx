@@ -6,7 +6,7 @@ import GenderDropdown from "./GenderDropdown";
 import SizeDropdown from "./SizeDropdown";
 import ColorsDropdwon from "./ColorsDropdwon";
 import PriceDropdown from "./PriceDropdown";
-import shopData from "../Shop/shopData";
+import { useStoreProducts } from "@/hooks/useProducts";
 import WhyChooseGloria from "../Common/WhyChooseGloria";
 import SingleGridItem from "../Shop/SingleGridItem";
 import SingleListItem from "../Shop/SingleListItem";
@@ -21,6 +21,7 @@ import {
 import ShopSidebarMaisons from "./ShopSidebarMaisons";
 
 const ShopWithSidebar = () => {
+  const { products } = useStoreProducts();
   const [productStyle, setProductStyle] = useState<"grid" | "list">("grid");
   const [productSidebar, setProductSidebar] = useState(false);
   const [stickyMenu, setStickyMenu] = useState(false);
@@ -36,13 +37,13 @@ const ShopWithSidebar = () => {
   );
 
   const filteredProducts = useMemo(
-    () => filterAndSortProducts(shopData, filters),
-    [filters]
+    () => filterAndSortProducts(products, filters),
+    [products, filters]
   );
 
   const sidebarBrandRows = useMemo(
-    () => getSidebarBrandRows(shopData),
-    []
+    () => getSidebarBrandRows(products),
+    [products]
   );
 
   const hasActiveFilters =

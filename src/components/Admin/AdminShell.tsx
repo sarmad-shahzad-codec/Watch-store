@@ -16,6 +16,8 @@ import {
   X,
   ExternalLink,
   Landmark,
+  Instagram,
+  MessageSquareQuote,
 } from "lucide-react";
 
 type NavItem = {
@@ -30,6 +32,8 @@ const NAV: NavItem[] = [
   { href: "/admin/orders", label: "Orders", icon: ShoppingBag },
   { href: "/admin/products", label: "Products", icon: Package },
   { href: "/admin/finances", label: "Finances", icon: Landmark },
+  { href: "/admin/testimonials", label: "Testimonials", icon: MessageSquareQuote },
+  { href: "/admin/instagram", label: "Instagram Feed", icon: Instagram },
   { href: "/admin/customers", label: "Customers", icon: Users },
   { href: "/admin/analytics", label: "Analytics", icon: BarChart3 },
   { href: "/admin/settings", label: "Settings", icon: Settings },
