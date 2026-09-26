@@ -52,7 +52,7 @@ const SingleListItem = ({ item }: { item: Product }) => {
             />
           </Link>
 
-          <div className="absolute left-0 bottom-0 z-[2] translate-y-full w-full flex flex-wrap items-center justify-center gap-2.5 pb-5 ease-linear duration-200 group-hover:translate-y-0 px-2">
+          <div className="absolute left-0 bottom-0 z-[2] w-full flex flex-wrap items-center justify-center gap-2.5 pb-5 opacity-0 group-hover:opacity-100 transition-opacity duration-200 px-2">
             <Link
               href={detailHref}
               className="inline-flex font-medium text-custom-sm py-[7px] px-4 rounded-[5px] border border-[#4A2F19]/30 text-[#2B1A0F] bg-white hover:bg-[#F3E3D0] transition-colors"

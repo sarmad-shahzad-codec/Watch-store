@@ -140,8 +140,8 @@ const ProductItem = ({ item }: { item: Product }) => {
           )}
         </Link>
 
-        {/* Slide-up Action Bar (2S Store Style: Solid High-Contrast Controls) */}
-        <div className="absolute inset-x-3 bottom-3 z-20 flex items-center gap-2 translate-y-2 opacity-0 group-hover:translate-y-0 group-hover:opacity-100 transition-all duration-300 ease-out">
+        {/* Static Action Bar (No bottom-to-top movement) */}
+        <div className="absolute inset-x-3 bottom-3 z-20 flex items-center gap-2 opacity-0 group-hover:opacity-100 transition-opacity duration-200">
           {isAccessory ? (
             <a
               href={`https://wa.me/923257982233?text=Assalam%20o%20Alaikum%20Gloria%20Times%2C%20I%20want%20to%20inquire%20about%20${encodeURIComponent(item.title)}%20(Coming%20Soon)`}

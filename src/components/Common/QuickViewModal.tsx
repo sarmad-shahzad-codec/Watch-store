@@ -10,7 +10,7 @@ import { useDispatch } from "react-redux";
 import { useAddToCart } from "@/hooks/useAddToCart";
 import { formatPkr } from "@/lib/formatCurrency";
 import { updateproductDetails } from "@/redux/features/product-details";
-import { X, ChevronLeft, ChevronRight, Check } from "lucide-react";
+import { X, ChevronLeft, ChevronRight, Check, Minus, Plus } from "lucide-react";
 
 const DEFAULT_DIAL_COLORS = [
   "Black",
@@ -260,20 +260,22 @@ const QuickViewModal = () => {
                         key={`${variant.name}-${variant.index}`}
                         type="button"
                         onClick={() => handleSelectVariant(variant)}
-                        className={`group/swatch relative flex items-center gap-1.5 pl-1.5 pr-2.5 py-1 rounded-lg border-2 text-xs font-semibold transition-all ${
+                        className={`group/swatch relative flex items-center gap-1.5 pl-1 pr-3 py-1 rounded-full border-2 text-xs font-semibold transition-all ${
                           isSelected
                             ? "bg-[#1E1E1E] text-white border-[#1E1E1E] ring-2 ring-[#8B6914]/40 shadow-sm"
                             : "bg-white text-gray-700 border-gray-200 hover:border-gray-400 hover:bg-gray-50"
                         }`}
                       >
-                        <div className="relative w-6 h-6 rounded bg-[#F7F5F2] border border-gray-200/80 overflow-hidden flex items-center justify-center flex-shrink-0">
+                        <div className={`relative w-6 h-6 rounded-full overflow-hidden flex items-center justify-center flex-shrink-0 p-0.5 border ${
+                          isSelected ? "border-[#E5B869] bg-[#222]" : "border-gray-300 bg-[#F7F5F2]"
+                        }`}>
                           <Image
                             src={variant.image}
                             alt={variant.name}
                             width={24}
                             height={24}
                             unoptimized={typeof variant.image === "string" && variant.image.includes("cloudinary")}
-                            className="object-contain max-h-full max-w-full group-hover/swatch:scale-110 transition-transform"
+                            className="object-contain max-h-full max-w-full rounded-full group-hover/swatch:scale-110 transition-transform"
                           />
                         </div>
                         <span className="truncate">{variant.name}</span>
@@ -293,23 +295,25 @@ const QuickViewModal = () => {
                 </label>
                 <div className="flex items-center gap-3">
                   {/* Quantity Stepper */}
-                  <div className="flex items-center justify-between w-28 h-11 px-3 bg-[#F2F2F2] rounded-md text-sm font-medium text-[#111]">
+                  <div className="flex items-center justify-between w-28 h-11 px-2 bg-[#F2F2F2] rounded-md text-sm font-medium text-[#111] border border-gray-200/60">
                     <button
                       type="button"
-                      onClick={() => quantity > 1 && setQuantity(quantity - 1)}
+                      onClick={() => setQuantity((prev) => (prev > 1 ? prev - 1 : 1))}
                       aria-label="Decrease quantity"
-                      className="p-1 hover:text-gray-600 transition-colors"
+                      className="w-8 h-8 flex items-center justify-center rounded text-gray-700 hover:text-black hover:bg-gray-200 active:scale-90 transition cursor-pointer select-none"
+                      title="Decrease quantity"
                     >
-                      –
+                      <Minus className="w-3.5 h-3.5 stroke-[2.5]" />
                     </button>
-                    <span>{quantity}</span>
+                    <span className="font-bold text-center min-w-[20px] select-none">{quantity}</span>
                     <button
                       type="button"
-                      onClick={() => setQuantity(quantity + 1)}
+                      onClick={() => setQuantity((prev) => prev + 1)}
                       aria-label="Increase quantity"
-                      className="p-1 hover:text-gray-600 transition-colors"
+                      className="w-8 h-8 flex items-center justify-center rounded text-gray-700 hover:text-black hover:bg-gray-200 active:scale-90 transition cursor-pointer select-none"
+                      title="Increase quantity"
                     >
-                      +
+                      <Plus className="w-3.5 h-3.5 stroke-[2.5]" />
                     </button>
                   </div>
 

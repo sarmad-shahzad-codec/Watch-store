@@ -7,7 +7,6 @@ import SingleGridItem from "../Shop/SingleGridItem";
 import SingleListItem from "../Shop/SingleListItem";
 
 import { useStoreProducts } from "@/hooks/useProducts";
-import WhyChooseGloria from "../Common/WhyChooseGloria";
 import ShopFilterToolbar, { BRAND_OPTIONS } from "../Shop/ShopFilterToolbar";
 import {
   filterAndSortProducts,
@@ -216,9 +215,6 @@ const ShopWithoutSidebarContent = () => {
           </div>
         </div>
       </section>
-
-      {/* Comparison & Trust Section below Watches */}
-      <WhyChooseGloria />
     </>
   );
 };

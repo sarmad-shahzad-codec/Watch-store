@@ -18,6 +18,7 @@ import {
   Landmark,
   Instagram,
   MessageSquareQuote,
+  Sparkles,
 } from "lucide-react";
 
 type NavItem = {
@@ -31,6 +32,7 @@ const NAV: NavItem[] = [
   { href: "/admin", label: "Overview", icon: LayoutDashboard, end: true },
   { href: "/admin/orders", label: "Orders", icon: ShoppingBag },
   { href: "/admin/products", label: "Products", icon: Package },
+  { href: "/admin/hero", label: "Hero Banner", icon: Sparkles },
   { href: "/admin/finances", label: "Finances", icon: Landmark },
   { href: "/admin/testimonials", label: "Testimonials", icon: MessageSquareQuote },
   { href: "/admin/instagram", label: "Instagram Feed", icon: Instagram },

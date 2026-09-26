@@ -7,7 +7,6 @@ import SizeDropdown from "./SizeDropdown";
 import ColorsDropdwon from "./ColorsDropdwon";
 import PriceDropdown from "./PriceDropdown";
 import { useStoreProducts } from "@/hooks/useProducts";
-import WhyChooseGloria from "../Common/WhyChooseGloria";
 import SingleGridItem from "../Shop/SingleGridItem";
 import SingleListItem from "../Shop/SingleListItem";
 import ShopFilterToolbar from "../Shop/ShopFilterToolbar";
@@ -357,9 +356,6 @@ const ShopWithSidebar = () => {
           </div>
         </div>
       </section>
-
-      {/* Comparison & Trust Section below Watches */}
-      <WhyChooseGloria />
     </>
   );
 };

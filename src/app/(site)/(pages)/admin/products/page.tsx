@@ -53,17 +53,18 @@ const BRAND_PRESETS = [
 ];
 
 const CATEGORY_PRESETS = [
-  "New In",
+  "Automatic Watches",
+  "Minimalist Watches",
+  "Premium Luxury",
   "Men's Collection",
   "Women's Collection",
+  "New In",
   "Watch Accessories",
-  "Men's Automatic Watches",
   "Chronograph Sport",
   "Diamond Bezel Luxury",
   "Diver Luxury Watches",
   "Classic Dress Watches",
   "Prestige Haute Horlogerie",
-  "Automatic Skeleton",
 ];
 
 const IMAGE_PRESETS = [
@@ -996,6 +997,24 @@ export default function AdminProductsPage() {
                   </span>
                 </div>
 
+                {/* Quick Section/Category Chips */}
+                <div className="flex flex-wrap gap-1.5 pb-1">
+                  {["Automatic Watches", "Minimalist Watches", "Premium Luxury", "Men's Collection", "Women's Collection", "New In"].map((c) => (
+                    <button
+                      key={c}
+                      type="button"
+                      onClick={() => setNewCategory(c)}
+                      className={`text-[11px] px-2.5 py-1 rounded-md font-semibold transition-all border ${
+                        newCategory === c
+                          ? "bg-[#008060] text-white border-[#008060] shadow-xs"
+                          : "bg-white text-gray-700 border-gray-200 hover:border-gray-400"
+                      }`}
+                    >
+                      {c}
+                    </button>
+                  ))}
+                </div>
+
                 {/* Primary Category Dropdown */}
                 <div>
                   <select
@@ -1427,6 +1446,24 @@ export default function AdminProductsPage() {
                     <span className="text-[10px] font-semibold text-[#008060]">
                       {categoriesList.length} Categories
                     </span>
+                  </div>
+
+                  {/* Quick Section/Category Chips */}
+                  <div className="flex flex-wrap gap-1.5 pb-1">
+                    {["Automatic Watches", "Minimalist Watches", "Premium Luxury", "Men's Collection", "Women's Collection", "New In"].map((c) => (
+                      <button
+                        key={c}
+                        type="button"
+                        onClick={() => setEditCategory(c)}
+                        className={`text-[11px] px-2.5 py-1 rounded-md font-semibold transition-all border ${
+                          editCategory === c
+                            ? "bg-[#008060] text-white border-[#008060] shadow-xs"
+                            : "bg-white text-gray-700 border-gray-200 hover:border-gray-400"
+                        }`}
+                      >
+                        {c}
+                      </button>
+                    ))}
                   </div>
 
                   {/* Dropdown */}

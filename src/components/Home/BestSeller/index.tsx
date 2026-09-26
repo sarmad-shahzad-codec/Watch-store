@@ -12,7 +12,7 @@ const BestSeller = () => {
     <section className="overflow-hidden py-14 sm:py-18">
       <div className="max-w-[1170px] w-full mx-auto px-4 sm:px-8 xl:px-0">
         {/* Section Title — Centered in the middle as requested */}
-        <div className="mb-10 sm:mb-12 text-center flex flex-col items-center justify-center">
+        <div className="mb-10 sm:mb-12 text-center flex flex-col items-center justify-center mx-auto">
           <div className="inline-flex items-center gap-2 font-medium text-xs sm:text-sm tracking-[0.22em] uppercase text-[#8A7A5C] mb-2">
             <svg
               width="18"
@@ -34,14 +34,14 @@ const BestSeller = () => {
                 strokeLinecap="round"
               />
             </svg>
-            <span>This Month</span>
+            <span>Top Picks · Curated</span>
           </div>
 
           <h2
-            className="font-medium text-2xl sm:text-3xl lg:text-4xl text-[#1C1C1B] tracking-tight"
+            className="font-medium text-2xl sm:text-3xl lg:text-4xl text-[#1C1C1B] tracking-tight text-center"
             style={{ fontFamily: "'Cormorant Garamond', Georgia, serif" }}
           >
-            Best Sellers
+            Best Sellers This Month
           </h2>
 
           <div className="w-14 h-[2px] bg-[#8A7A5C]/60 mt-3 rounded-full" />

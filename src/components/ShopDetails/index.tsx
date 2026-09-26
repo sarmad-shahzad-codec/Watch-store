@@ -31,6 +31,9 @@ import {
   Zap,
   Share2,
   CheckCircle2,
+  Minus,
+  Plus,
+  X,
 } from "lucide-react";
 
 type ShopDetailsProps = {
@@ -61,6 +64,7 @@ const ShopDetails = ({ productId }: ShopDetailsProps) => {
   const [isWishlisted, setIsWishlisted] = useState(false);
   const [isAdded, setIsAdded] = useState(false);
   const [showStickyBar, setShowStickyBar] = useState(false);
+  const [stickyBarDismissed, setStickyBarDismissed] = useState(false);
   const [viewerCount, setViewerCount] = useState(30);
 
   const buySectionRef = useRef<HTMLDivElement>(null);
@@ -84,6 +88,14 @@ const ShopDetails = ({ productId }: ShopDetailsProps) => {
       }
     }
   }, [fromCatalog, dispatch]);
+
+  // Instant static page positioning without scroll animation
+  useEffect(() => {
+    setStickyBarDismissed(false);
+    if (typeof window !== "undefined") {
+      window.scrollTo({ top: 0, left: 0, behavior: "instant" as ScrollBehavior });
+    }
+  }, [productId]);
 
   // Subtle realistic fluctuation for live viewers (26 - 36)
   useEffect(() => {
@@ -466,21 +478,23 @@ const ShopDetails = ({ productId }: ShopDetailsProps) => {
                           key={`${variant.name}-${variant.index}`}
                           type="button"
                           onClick={() => handleSelectVariant(variant)}
-                          className={`group/swatch relative flex items-center gap-2 pl-1.5 pr-3 py-1.5 rounded-lg border-2 text-xs font-semibold transition-all shadow-xs ${
+                          className={`group/swatch relative flex items-center gap-2 pl-1 pr-3.5 py-1 rounded-full border-2 text-xs font-semibold transition-all shadow-xs ${
                             isSelected
                               ? "bg-[#111111] text-white border-[#111111] ring-2 ring-[#8B6914]/40 shadow-sm"
                               : "bg-white text-gray-800 border-gray-200 hover:border-gray-400 hover:bg-gray-50/80"
                           }`}
                         >
-                          {/* Mini Watch Preview Thumbnail */}
-                          <div className="relative w-8 h-8 rounded-md bg-[#F7F5F2] border border-gray-200/80 overflow-hidden flex items-center justify-center flex-shrink-0">
+                          {/* Mini Watch Preview Thumbnail - Circle */}
+                          <div className={`relative w-8 h-8 rounded-full overflow-hidden flex items-center justify-center flex-shrink-0 p-0.5 border ${
+                            isSelected ? "border-[#E5B869] bg-[#222]" : "border-gray-300 bg-[#F7F5F2]"
+                          }`}>
                             <Image
                               src={variant.image}
                               alt={variant.name}
                               width={32}
                               height={32}
                               unoptimized={typeof variant.image === "string" && variant.image.includes("cloudinary")}
-                              className="object-contain max-h-full max-w-full group-hover/swatch:scale-110 transition-transform duration-200"
+                              className="object-contain max-h-full max-w-full rounded-full group-hover/swatch:scale-110 transition-transform duration-200"
                             />
                           </div>
 
@@ -506,23 +520,25 @@ const ShopDetails = ({ productId }: ShopDetailsProps) => {
 
                   <div className="flex items-center gap-3">
                     {/* Stepper [- 1 +] */}
-                    <div className="flex items-center justify-between w-28 sm:w-32 h-11 px-3 bg-[#F2F2F2] rounded-lg text-sm sm:text-base font-semibold text-gray-900">
+                    <div className="flex items-center justify-between w-28 sm:w-32 h-11 px-2 bg-[#F2F2F2] rounded-lg text-sm sm:text-base font-semibold text-gray-900 border border-gray-200/60">
                       <button
                         type="button"
-                        onClick={() => quantity > 1 && setQuantity(quantity - 1)}
+                        onClick={() => setQuantity((prev) => (prev > 1 ? prev - 1 : 1))}
                         aria-label="Decrease quantity"
-                        className="p-1 hover:text-gray-600 transition-colors"
+                        className="w-8 h-8 flex items-center justify-center rounded text-gray-700 hover:text-black hover:bg-gray-200 active:scale-90 transition cursor-pointer select-none"
+                        title="Decrease quantity"
                       >
-                        –
+                        <Minus className="w-4 h-4 stroke-[2.5]" />
                       </button>
-                      <span>{quantity}</span>
+                      <span className="font-bold text-center min-w-[24px] select-none">{quantity}</span>
                       <button
                         type="button"
-                        onClick={() => setQuantity(quantity + 1)}
+                        onClick={() => setQuantity((prev) => prev + 1)}
                         aria-label="Increase quantity"
-                        className="p-1 hover:text-gray-600 transition-colors"
+                        className="w-8 h-8 flex items-center justify-center rounded text-gray-700 hover:text-black hover:bg-gray-200 active:scale-90 transition cursor-pointer select-none"
+                        title="Increase quantity"
                       >
-                        +
+                        <Plus className="w-4 h-4 stroke-[2.5]" />
                       </button>
                     </div>
 
@@ -614,75 +630,7 @@ const ShopDetails = ({ productId }: ShopDetailsProps) => {
           </div>
         </section>
 
-        {/* Comparison Table Section (From media_1788871146010.png) */}
-        <section className="bg-[#FAF9F7] py-14 border-y border-gray-200/70">
-          <div className="max-w-[860px] mx-auto px-4 sm:px-6">
-            <div className="text-center mb-8">
-              <h2 className="text-2xl sm:text-3xl font-bold text-gray-900">
-                Why People Choose Gloria Times
-              </h2>
-              <p className="text-sm sm:text-base text-gray-600 mt-1">
-                GLORIA TIMES ⌚ VS Others
-              </p>
-            </div>
 
-            {/* Comparison Table */}
-            <div className="bg-white rounded-2xl border border-gray-200 shadow-sm overflow-hidden">
-              <div className="grid grid-cols-12 bg-black text-white py-3.5 px-4 sm:px-6 text-xs sm:text-sm font-bold uppercase tracking-wider">
-                <div className="col-span-6 sm:col-span-7">Features</div>
-                <div className="col-span-3 sm:col-span-3 text-center">Gloria Times</div>
-                <div className="col-span-3 sm:col-span-2 text-center text-gray-400">Others</div>
-              </div>
-
-              <div className="divide-y divide-gray-100">
-                {[
-                  {
-                    title: "Premium stainless steel & leather straps",
-                    ours: true,
-                    theirs: false,
-                  },
-                  {
-                    title: "Scratch-resistant glass",
-                    ours: true,
-                    theirs: false,
-                  },
-                  {
-                    title: "Water-resistant design",
-                    ours: true,
-                    theirs: false,
-                  },
-                  {
-                    title: "Luxury look at affordable price",
-                    ours: true,
-                    theirs: false,
-                  },
-                  {
-                    title: "Fast delivery & Nationwide Cash on Delivery",
-                    ours: true,
-                    theirs: false,
-                  },
-                ].map((row, idx) => (
-                  <div
-                    key={idx}
-                    className="grid grid-cols-12 items-center py-4 px-4 sm:px-6 hover:bg-gray-50/70 transition-colors"
-                  >
-                    <div className="col-span-6 sm:col-span-7 text-xs sm:text-sm font-semibold text-gray-900">
-                      {row.title}
-                    </div>
-                    <div className="col-span-3 sm:col-span-3 flex justify-center">
-                      <span className="w-8 h-8 rounded-full bg-black text-white flex items-center justify-center font-bold text-sm shadow-sm">
-                        ✓
-                      </span>
-                    </div>
-                    <div className="col-span-3 sm:col-span-2 flex justify-center">
-                      <span className="text-gray-400 font-semibold text-lg">✕</span>
-                    </div>
-                  </div>
-                ))}
-              </div>
-            </div>
-          </div>
-        </section>
 
         {/* Tabs: Description, Specs, Reviews, Shipping */}
         <section className="bg-white py-14">
@@ -893,19 +841,20 @@ const ShopDetails = ({ productId }: ShopDetailsProps) => {
 
         {/* Sticky Bottom Purchase Bar (Exact Match to bottom of media_1788871114450.png) */}
         <div
-          className={`fixed bottom-0 left-0 right-0 z-40 bg-white border-t border-gray-200 shadow-2xl transition-transform duration-300 px-4 py-2 ${
-            showStickyBar ? "translate-y-0" : "translate-y-full"
+          className={`fixed bottom-0 left-0 right-0 z-40 bg-white border-t border-gray-200 shadow-2xl transition-transform duration-300 px-3 sm:px-4 py-2 ${
+            showStickyBar && !stickyBarDismissed ? "translate-y-0" : "translate-y-full pointer-events-none"
           }`}
         >
-          <div className="max-w-[1240px] mx-auto flex items-center justify-between gap-3 sm:gap-6">
+          <div className="max-w-[1240px] mx-auto flex items-center justify-between gap-2 sm:gap-6">
             {/* Left: Thumbnail & Title */}
-            <div className="flex items-center gap-3 min-w-0">
-              <div className="w-11 h-11 rounded-lg bg-[#F7F5F2] border border-gray-200 overflow-hidden flex-shrink-0 flex items-center justify-center">
+            <div className="flex items-center gap-2.5 sm:gap-3 min-w-0">
+              <div className="w-10 h-10 sm:w-11 sm:h-11 rounded-lg bg-[#F7F5F2] border border-gray-200 overflow-hidden flex-shrink-0 flex items-center justify-center">
                 <Image
                   src={currentPreview}
                   alt={product.title}
                   width={44}
                   height={44}
+                  unoptimized={typeof currentPreview === "string" && (currentPreview.includes("cloudinary") || currentPreview.startsWith("http"))}
                   className="object-contain"
                 />
               </div>
@@ -941,32 +890,54 @@ const ShopDetails = ({ productId }: ShopDetailsProps) => {
               </select>
             </div>
 
-            {/* Right: Stepper & Black Add to Cart Button */}
-            <div className="flex items-center gap-2 sm:gap-3 flex-shrink-0">
-              <div className="flex items-center justify-between w-20 sm:w-24 h-9 px-2 bg-gray-100 rounded-md text-xs sm:text-sm font-semibold">
+            {/* Right: Stepper, Add to Cart & Dismiss Cross Button */}
+            <div className="flex items-center gap-1.5 sm:gap-3 flex-shrink-0">
+              <div className="flex items-center justify-between w-20 sm:w-24 h-9 px-1 bg-gray-100 rounded-md text-xs sm:text-sm font-semibold border border-gray-200">
                 <button
                   type="button"
-                  onClick={() => quantity > 1 && setQuantity(quantity - 1)}
-                  className="hover:text-gray-600 px-1"
+                  onClick={() => setQuantity((prev) => (prev > 1 ? prev - 1 : 1))}
+                  aria-label="Decrease quantity"
+                  className="w-6 sm:w-7 h-7 flex items-center justify-center rounded text-gray-700 hover:text-black hover:bg-gray-200 active:scale-90 transition cursor-pointer select-none"
+                  title="Decrease"
                 >
-                  –
+                  <Minus className="w-3.5 h-3.5 stroke-[2.5]" />
                 </button>
-                <span>{quantity}</span>
+                <span className="font-semibold text-center min-w-[16px] sm:min-w-[20px] select-none text-gray-900">{quantity}</span>
                 <button
                   type="button"
-                  onClick={() => setQuantity(quantity + 1)}
-                  className="hover:text-gray-600 px-1"
+                  onClick={() => setQuantity((prev) => prev + 1)}
+                  aria-label="Increase quantity"
+                  className="w-6 sm:w-7 h-7 flex items-center justify-center rounded text-gray-700 hover:text-black hover:bg-gray-200 active:scale-90 transition cursor-pointer select-none"
+                  title="Increase"
                 >
-                  +
+                  <Plus className="w-3.5 h-3.5 stroke-[2.5]" />
                 </button>
               </div>
 
               <button
                 type="button"
                 onClick={handleAddToCart}
-                className="h-9 sm:h-10 px-4 sm:px-6 rounded-md bg-black hover:bg-gray-900 text-white font-semibold text-xs sm:text-sm uppercase tracking-wide transition-all shadow-sm"
+                className="h-9 sm:h-10 px-3.5 sm:px-6 rounded-md bg-black hover:bg-gray-900 text-white font-semibold text-xs sm:text-sm uppercase tracking-wide transition-all shadow-sm active:scale-95 flex items-center gap-1.5"
               >
-                Add to cart
+                {isAdded ? (
+                  <>
+                    <Check className="w-3.5 h-3.5 text-emerald-400" />
+                    <span>Added</span>
+                  </>
+                ) : (
+                  <span>Add to cart</span>
+                )}
+              </button>
+
+              {/* Dismiss / Close Cross Button */}
+              <button
+                type="button"
+                onClick={() => setStickyBarDismissed(true)}
+                aria-label="Close bottom bar"
+                className="w-8 h-8 rounded-full flex items-center justify-center text-gray-400 hover:text-black hover:bg-gray-100 transition-colors shrink-0 cursor-pointer"
+                title="Close bar"
+              >
+                <X className="w-4.5 h-4.5" strokeWidth={2} />
               </button>
             </div>
           </div>

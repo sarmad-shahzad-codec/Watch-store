@@ -4,7 +4,6 @@ import React, { useMemo } from "react";
 import Link from "next/link";
 import ProductItem from "@/components/Common/ProductItem";
 import { useStoreProducts } from "@/hooks/useProducts";
-import WhyChooseGloria from "@/components/Common/WhyChooseGloria";
 import { ChevronRight, ArrowLeft, ShieldCheck, Truck, PackageCheck } from "lucide-react";
 
 type CategoryPageProps = {
@@ -44,6 +43,30 @@ const BRAND_CONFIG: Record<
     tagline: "Swiss Automatic, Divers & Classic Dress Timepieces For Him",
     description:
       "Discover our definitive lineup of luxury men's watches—featuring ceramic bezels, automatic movements, chronograph tachymeters, and robust stainless steel bracelets.",
+    isComingSoon: false,
+  },
+  automatic: {
+    name: "Automatic Watches",
+    brandKey: "automatic",
+    tagline: "Mechanical Precision, Sweeping Seconds & Rotor Powered",
+    description:
+      "Self-winding mechanical movements powered by the natural motion of your wrist. Featuring exhibition casebacks, 28,800 vph sweep, and intricate skeleton dials.",
+    isComingSoon: false,
+  },
+  minimal: {
+    name: "Minimalist Watches",
+    brandKey: "minimal",
+    tagline: "Clean Dial Aesthetics, Ultra-Slim Profiles & Modern Refinement",
+    description:
+      "Effortless elegance designed for discerning tastes. Uncluttered indices, refined baton hands, and slim ergonomic profiles for subtle prestige.",
+    isComingSoon: false,
+  },
+  premium: {
+    name: "Premium Luxury Watches",
+    brandKey: "premium",
+    tagline: "Haute Horlogerie, Prestige Finishes & Signature Masterpieces",
+    description:
+      "The pinnacle of watchmaking artistry. Master-crafted with high-grade 904L stainless steel, sapphire crystal glass, and iconic luxury architecture.",
     isComingSoon: false,
   },
   tissot: {
@@ -197,6 +220,58 @@ export default function CategoryPageComponent({ slug }: CategoryPageProps) {
       return products.filter((p) => {
         const cleanBrand = clean(p.brand || "");
         return !cleanBrand.includes("accessories");
+      });
+    }
+
+    if (normalizedSlug === "automatic") {
+      return products.filter((p) => {
+        const cat = clean(p.category || "");
+        const title = clean(p.title || "");
+        const desc = clean(p.description || "");
+        const specs = (p.specs || []).join(" ").toLowerCase();
+        return (
+          cat.includes("automatic") ||
+          title.includes("automatic") ||
+          title.includes("powermatic") ||
+          title.includes("skeleton") ||
+          desc.includes("automatic") ||
+          specs.includes("automatic")
+        );
+      });
+    }
+
+    if (normalizedSlug === "minimal" || normalizedSlug === "minimalist") {
+      return products.filter((p) => {
+        const cat = clean(p.category || "");
+        const title = clean(p.title || "");
+        const desc = clean(p.description || "");
+        return (
+          cat.includes("minimal") ||
+          cat.includes("classic") ||
+          title.includes("prx") ||
+          title.includes("minimal") ||
+          title.includes("santos") ||
+          desc.includes("minimal") ||
+          desc.includes("clean")
+        );
+      });
+    }
+
+    if (normalizedSlug === "premium" || normalizedSlug === "luxury") {
+      return products.filter((p) => {
+        const cat = clean(p.category || "");
+        const title = clean(p.title || "");
+        const brand = clean(p.brand || "");
+        return (
+          cat.includes("premium") ||
+          cat.includes("luxury") ||
+          cat.includes("prestige") ||
+          brand.includes("rolex") ||
+          brand.includes("patek") ||
+          brand.includes("hublot") ||
+          brand.includes("audemars") ||
+          p.price >= 25000
+        );
       });
     }
 
@@ -514,9 +589,6 @@ export default function CategoryPageComponent({ slug }: CategoryPageProps) {
 
           </div>
         </section>
-
-        {/* Comparison Table Section Directly Below Watches */}
-        <WhyChooseGloria />
 
       </div>
     </div>

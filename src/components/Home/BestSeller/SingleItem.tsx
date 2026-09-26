@@ -132,8 +132,8 @@ const SingleItem = ({ item }: { item: Product }) => {
           )}
         </Link>
 
-        {/* Slide-up Action Bar (2S Store Style: Solid High-Contrast Controls) */}
-        <div className="absolute inset-x-3 bottom-3 z-20 flex items-center gap-2 translate-y-2 opacity-0 group-hover:translate-y-0 group-hover:opacity-100 transition-all duration-300 ease-out">
+        {/* Static Action Bar (No bottom-to-top movement) */}
+        <div className="absolute inset-x-3 bottom-3 z-20 flex items-center gap-2 opacity-0 group-hover:opacity-100 transition-opacity duration-200">
           <button
             type="button"
             onClick={handleAddToCart}
